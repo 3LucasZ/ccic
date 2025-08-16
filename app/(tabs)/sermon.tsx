@@ -1,21 +1,23 @@
-import { Text, View, StyleSheet } from "react-native";
+import { Download } from "lucide-react-native";
+import { View } from "react-native";
+import { Button } from "~/components/ui/button";
+import { Text } from "~/components/ui/text";
 
 export default function SermonScreen() {
   return (
-    <View style={styles.container}>
-      <Text style={styles.text}>About screen</Text>
+    <View>
+      <View className="flex-row">
+        <Button>
+          <Text>Watch</Text>
+        </Button>
+        <Button>
+          <Download />
+        </Button>
+      </View>
+      <Text>Matthew 5:12</Text>
+      <Text>Notes</Text>
+      <Text>Challenge</Text>
+      <Text>How is God calling you to love one another?</Text>
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#25292e",
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  text: {
-    color: "#fff",
-  },
-});
