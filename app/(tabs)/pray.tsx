@@ -15,7 +15,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "~/components/ui/tabs";
 import { Text } from "~/components/ui/text";
 import { Check, Plus } from "lucide-react-native";
 
-export default function PrayScreen() {
+export default function Screen() {
   const [value, setValue] = React.useState("all");
   return (
     <View className="flex-1">

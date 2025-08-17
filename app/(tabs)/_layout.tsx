@@ -47,6 +47,13 @@ export default function TabLayout() {
           tabBarIcon: ({ color, focused }) => <UserRound color={color} />,
         }}
       />
+      {/* <Tabs.Screen
+        name="about"
+        options={{
+          title: "About",
+          tabBarStyle: { visibility: "hidden" },
+        }}
+      /> */}
     </Tabs>
   );
 }

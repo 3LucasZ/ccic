@@ -6,8 +6,9 @@ import { Button } from "~/components/ui/button";
 import { Check } from "~/lib/icons/Check";
 import { X } from "~/lib/icons/X";
 import { Tabs, TabsList, TabsTrigger } from "~/components/ui/tabs";
+import { Link } from "expo-router";
 
-export default function ProfileScreen() {
+export default function Screen() {
   const avatar_uri = "https://avatars.githubusercontent.com/u/72239682?v=4";
   const name = "Lucas Zheng";
   const avatar_fallback = "LZ";
@@ -37,6 +38,11 @@ export default function ProfileScreen() {
           </TabsTrigger>
         </TabsList>
       </Tabs>
+      <Link href="/about" asChild>
+        <Button>
+          <Text>About Us</Text>
+        </Button>
+      </Link>
       <Text>Requests</Text>
       <View>
         <FriendRequest

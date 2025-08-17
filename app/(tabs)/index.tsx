@@ -23,7 +23,6 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "~/components/ui/tooltip";
-import Avatar2 from "~/components/ui/avatar2";
 
 export default function Screen() {
   const [progress, setProgress] = React.useState(78);
@@ -33,7 +32,7 @@ export default function Screen() {
     setProgress(Math.floor(Math.random() * 100));
   }
   return (
-    <View className="flex-1">
+    <View className="flex-col">
       <ScrollView horizontal showsHorizontalScrollIndicator={false}>
         <View className="flex-row gap-4 p-2">
           {Array.from({ length: 10 }).map((_, index) => (
@@ -41,6 +40,14 @@ export default function Screen() {
           ))}
         </View>
       </ScrollView>
+      <Card className="w-full">
+        <CardHeader>
+          <CardTitle>Challenge</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <Text>How is God calling you to love one another today?</Text>
+        </CardContent>
+      </Card>
       <Card className="w-full">
         <CardHeader>
           <CardTitle>Bulletin Board</CardTitle>
