@@ -14,6 +14,10 @@ export default function TabLayout() {
           // remove ugly white outline
           shadowOpacity: 0,
         },
+        tabBarStyle: {
+          // remove ugly white outline
+          borderColor: "transparent",
+        },
       }}
     >
       <Tabs.Screen
