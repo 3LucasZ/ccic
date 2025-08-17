@@ -5,11 +5,13 @@ import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar";
 import { Button } from "~/components/ui/button";
 import { Check } from "~/lib/icons/Check";
 import { X } from "~/lib/icons/X";
+import { Tabs, TabsList, TabsTrigger } from "~/components/ui/tabs";
 
 export default function ProfileScreen() {
   const avatar_uri = "https://avatars.githubusercontent.com/u/72239682?v=4";
   const name = "Lucas Zheng";
   const avatar_fallback = "LZ";
+  const [value, setValue] = React.useState("account");
   return (
     <View>
       <View className="flex-row ">
@@ -21,6 +23,20 @@ export default function ProfileScreen() {
         </Avatar>
         <Text className="text-2xl font-semibold">{name}</Text>
       </View>
+      <Tabs
+        value={value}
+        onValueChange={setValue}
+        className="w-full max-w-[400px] mx-auto flex-col gap-1.5"
+      >
+        <TabsList className="flex-row w-full">
+          <TabsTrigger value="account" className="flex-1">
+            <Text>English</Text>
+          </TabsTrigger>
+          <TabsTrigger value="password" className="flex-1">
+            <Text>中文</Text>
+          </TabsTrigger>
+        </TabsList>
+      </Tabs>
       <Text>Requests</Text>
       <View>
         <FriendRequest
