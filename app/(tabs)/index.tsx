@@ -36,7 +36,7 @@ export default function Screen() {
       <ScrollView horizontal showsHorizontalScrollIndicator={false}>
         <View className="flex-row gap-4 p-2">
           {Array.from({ length: 10 }).map((_, index) => (
-            <Buddy uri={""} name={"Lucas Zheng"} />
+            <Buddy uri={""} name={"Lucas Zheng"} key={index} />
           ))}
         </View>
       </ScrollView>

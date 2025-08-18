@@ -10,7 +10,9 @@ export default function Screen() {
       <Text>
         The main mission of the CCIC app is to connect the entire CCIC church
         family together: Chinese, English, and Cantonese speaking members from
-        our various campuses in North California.
+        our various campuses in North California in Christ. Given the ambitious
+        mission of welcoming 100 new members to Abide, this app will facilitate
+        the transition.
       </Text>
       <Text>We also hope to make it easier to: </Text>
       <Text>

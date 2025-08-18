@@ -41,42 +41,15 @@ export default function Screen() {
         <TabsContent value="all">
           <ScrollView showsVerticalScrollIndicator={false}>
             <View className="gap-2">
-              <Prayer
-                name={"LZ"}
-                avatar_uri={"LZ"}
-                text={"My prayer request"}
-                date={new Date()}
-              />
-              <Prayer
-                name={"LZ"}
-                avatar_uri={"LZ"}
-                text={"My prayer request"}
-                date={new Date()}
-              />
-              <Prayer
-                name={"LZ"}
-                avatar_uri={"LZ"}
-                text={"My prayer request"}
-                date={new Date()}
-              />
-              <Prayer
-                name={"LZ"}
-                avatar_uri={"LZ"}
-                text={"My prayer request"}
-                date={new Date()}
-              />
-              <Prayer
-                name={"LZ"}
-                avatar_uri={"LZ"}
-                text={"My prayer request"}
-                date={new Date()}
-              />
-              <Prayer
-                name={"LZ"}
-                avatar_uri={"LZ"}
-                text={"My prayer request"}
-                date={new Date()}
-              />
+              {Array.from({ length: 10 }).map((_, index) => (
+                <Prayer
+                  name={"LZ"}
+                  avatar_uri={""}
+                  text={"My prayer request"}
+                  date={new Date()}
+                  key={index}
+                />
+              ))}
               <View className="h-36"></View>
             </View>
           </ScrollView>
@@ -139,8 +112,8 @@ function Prayer({
         </View>
 
         {/* Wrap interactive icons in a Button for better UX */}
-        <Button variant="ghost" size="icon">
-          <HeartHandshake className="text-rose-400 h-6 w-6" />
+        <Button variant="secondary" size="icon" className="w-12 h-12">
+          <HeartHandshake className="text-rose-400" size={28} />
         </Button>
       </CardHeader>
 

@@ -65,7 +65,7 @@ function Logo() {
         className="w-8 h-8"
         source={require("../../assets/images/logo.png")}
         // force rectangular icon to fit well
-        resizeMode="contain"
+        contentFit="contain"
       />
       <View className="w-4"></View>
       <Text>CCIC</Text>
