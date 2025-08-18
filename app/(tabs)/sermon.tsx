@@ -6,10 +6,12 @@ import { Text } from "~/components/ui/text";
 import { ChevronLeft } from "~/lib/icons/ChevronLeft";
 import { ChevronRight } from "~/lib/icons/ChevronRight";
 import { supabase } from "~/lib/supabase";
+import { Tables } from "~/lib/types";
 
 export default function Screen() {
   const [loading, setLoading] = useState(true);
-  const [sermons, setSermons] = useState([]);
+  const [sermons, setSermons] = useState<Tables<"sermons">[]>([]);
+  const [index, setIndex] = useState(0);
   async function getData() {
     const { data, error, status } = await supabase.from("sermons").select();
     if (data) {
@@ -19,13 +21,17 @@ export default function Screen() {
   useEffect(() => {
     getData();
   }, []);
+  const sermon = sermons[index];
   return (
     <View>
       <View className="flex-row">
         <Button>
           <ChevronLeft />
         </Button>
-        <Text>Sermon 8/18/25</Text>
+        <View>
+          <Text>{sermon.title}</Text>
+          <Text>{sermon.date}</Text>
+        </View>
         <Button>
           <ChevronRight />
         </Button>
@@ -38,10 +44,11 @@ export default function Screen() {
           <Download />
         </Button>
       </View>
-      <Text>Matthew 5:12</Text>
-      <Text>Notes</Text>
-      <Text>Challenge</Text>
-      <Text>How is God calling you to love one another?</Text>
+      <Text>{sermon.passage}</Text>
+      <Text>Summary</Text>
+      <Text>{sermon.summary}</Text>
+      <Text>Application</Text>
+      <Text>{sermon.application}</Text>
     </View>
   );
 }
