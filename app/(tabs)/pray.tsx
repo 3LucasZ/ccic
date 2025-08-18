@@ -1,6 +1,6 @@
 import { HeartHandshake } from "~/lib/icons/Hands";
 import React from "react";
-import { Pressable, ScrollView, View } from "react-native";
+import { Pressable, SafeAreaView, ScrollView, View } from "react-native";
 import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar";
 import { Button } from "~/components/ui/button";
 import {
@@ -18,11 +18,11 @@ import { Check, Plus } from "lucide-react-native";
 export default function Screen() {
   const [value, setValue] = React.useState("all");
   return (
-    <View className="flex-1">
+    <SafeAreaView className="flex-1">
       <Tabs
         value={value}
         onValueChange={setValue}
-        className="w-full max-w-[400px] mx-auto flex-col gap-1.5"
+        className="w-full flex-col gap-2"
       >
         <TabsList className="flex-row w-full">
           <TabsTrigger value="all" className="flex-1">
@@ -100,7 +100,7 @@ export default function Screen() {
       >
         <Plus />
       </Pressable>
-    </View>
+    </SafeAreaView>
   );
 }
 function Prayer({
@@ -116,22 +116,38 @@ function Prayer({
 }) {
   return (
     <Card>
-      <CardTitle>
-        <Avatar alt="" className="w-16 h-16">
+      {/* Use CardHeader for titles and avatars. Use flex-row for layout. */}
+      <CardHeader className="flex-row items-center p-4">
+        <Avatar alt={`${name}'s avatar`} className="w-12 h-12">
           <AvatarImage source={{ uri: avatar_uri }} />
           <AvatarFallback>
             <Text>{"LZ"}</Text>
           </AvatarFallback>
         </Avatar>
-        <Text>{name}</Text>
-        <HeartHandshake className="text-rose-400" />
-      </CardTitle>
-      <CardContent>
-        <Text>{text}</Text>
+
+        {/* This View takes up the middle space, pushing the icon to the right */}
+        <View className="flex-1 ml-4">
+          <CardTitle>{name}</CardTitle>
+          {/* Use CardDescription for secondary info. Format the date nicely. */}
+          <CardDescription>
+            {date.toLocaleDateString("en-US", {
+              year: "numeric",
+              month: "long",
+              day: "numeric",
+            })}
+          </CardDescription>
+        </View>
+
+        {/* Wrap interactive icons in a Button for better UX */}
+        <Button variant="ghost" size="icon">
+          <HeartHandshake className="text-rose-400 h-6 w-6" />
+        </Button>
+      </CardHeader>
+
+      <CardContent className="p-4 pt-0">
+        <Text className="text-base">{text}</Text>
       </CardContent>
-      <CardFooter>
-        <Text>{date.toString()}</Text>
-      </CardFooter>
+      {/* CardFooter is often used for actions, moved the date to the header */}
     </Card>
   );
 }
