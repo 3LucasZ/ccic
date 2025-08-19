@@ -96,8 +96,8 @@ export default function Screen() {
           <Button className="flex-1">
             <Text>Watch on YouTube</Text>
           </Button>
-          <Button variant="outline" size="icon">
-            <Download />
+          <Button variant="secondary" className="">
+            <Download className="text-white" />
           </Button>
         </View>
 

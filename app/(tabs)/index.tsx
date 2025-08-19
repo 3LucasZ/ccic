@@ -23,14 +23,9 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "~/components/ui/tooltip";
+import { Link } from "expo-router";
 
 export default function Screen() {
-  const [progress, setProgress] = React.useState(78);
-  const size = 60;
-
-  function updateProgressValue() {
-    setProgress(Math.floor(Math.random() * 100));
-  }
   return (
     <View className="flex-col">
       <ScrollView horizontal showsHorizontalScrollIndicator={false}>
@@ -40,6 +35,11 @@ export default function Screen() {
           ))}
         </View>
       </ScrollView>
+      <Link href="/write" asChild>
+        <Button>
+          <Text>Write</Text>
+        </Button>
+      </Link>
       <Card className="w-full">
         <CardHeader>
           <CardTitle>Challenge</CardTitle>

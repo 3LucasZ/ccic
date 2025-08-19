@@ -37,6 +37,7 @@ export default function TabLayout() {
         name="sermon"
         options={{
           title: "Sermon",
+          headerShown: false,
           tabBarIcon: ({ color, focused }) => <BookOpen color={color} />,
         }}
       />
@@ -44,6 +45,7 @@ export default function TabLayout() {
         name="profile"
         options={{
           title: "Profile",
+          headerShown: false,
           tabBarIcon: ({ color, focused }) => <UserRound color={color} />,
         }}
       />
