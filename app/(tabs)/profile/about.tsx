@@ -1,14 +1,14 @@
-import { Download } from "lucide-react-native";
-import { SafeAreaView, ScrollView, View } from "react-native";
+import { router } from "expo-router";
+import { ChevronLeft, Download } from "lucide-react-native";
+import { Pressable, SafeAreaView, ScrollView, View } from "react-native";
+import ChevronHeader from "~/components/ChevronHeader";
 import { Button } from "~/components/ui/button";
 import { Text } from "~/components/ui/text";
 
 export default function Screen() {
   return (
     <SafeAreaView className="flex-1 p-4">
-      <View className="p-4">
-        <Text className="text-3xl font-bold">About Us</Text>
-      </View>
+      <ChevronHeader title="About Us" />
       <ScrollView>
         <View className="p-4">
           <Text className="text-xl font-bold">Mission</Text>

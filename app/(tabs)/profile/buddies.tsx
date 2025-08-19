@@ -1,14 +1,16 @@
 import * as React from "react";
-import { SafeAreaView, ScrollView, View } from "react-native";
+import { Pressable, SafeAreaView, ScrollView, View } from "react-native";
 import { Text } from "~/components/ui/text";
 import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar";
 import { Button } from "~/components/ui/button";
 import { Check } from "~/lib/icons/Check";
 import { X } from "~/lib/icons/X";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "~/components/ui/tabs";
-import { Link } from "expo-router";
+import { Link, router } from "expo-router";
 import { useSession } from "~/lib/ctx";
 import { fallbackFromName } from "~/lib/utils";
+import { ChevronLeft } from "~/lib/icons/ChevronLeft";
+import ChevronHeader from "~/components/ChevronHeader";
 
 type Buddy = {
   id: number;
@@ -40,9 +42,7 @@ export default function Screen() {
   const [value, setValue] = React.useState("buddies");
   return (
     <SafeAreaView className="flex-1 p-4">
-      <View className="p-4">
-        <Text className="text-3xl font-bold">My Buddies</Text>
-      </View>
+      <ChevronHeader title="My Buddies" />
       <Tabs className="flex-1" value={value} onValueChange={setValue}>
         <TabsList className="flex-row mx-4">
           <TabsTrigger value="buddies" className="flex-1">

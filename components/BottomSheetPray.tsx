@@ -14,16 +14,18 @@ import {
   useState,
 } from "react";
 import { Text } from "components/ui/text";
-import { StyleSheet, View } from "react-native";
+import { Keyboard, StyleSheet, View } from "react-native";
 import { Button } from "./ui/button";
 type BottomSheetPrayProps = {};
 const BottomSheetPray = forwardRef<BottomSheet, BottomSheetPrayProps>(
   (props, ref) => {
     const [value, setValue] = useState("");
     const snapPoints = useMemo(() => ["60%"], []);
+    const handleClosePress = () => ref.current?.close();
     const handleSheetChanges = useCallback((index: number) => {
       // on close
       if (index == -1) {
+        Keyboard.dismiss();
       }
     }, []);
     const renderBackdrop = useCallback(
@@ -43,7 +45,13 @@ const BottomSheetPray = forwardRef<BottomSheet, BottomSheetPrayProps>(
             <Button className="flex-1 bg-teal-400">
               <Text className="">Send</Text>
             </Button>
-            <Button className="flex-1 bg-red-400" onPress={() => setValue("")}>
+            <Button
+              className="flex-1 bg-red-400"
+              onPress={() => {
+                setValue("");
+                handleClosePress();
+              }}
+            >
               <Text>Discard</Text>
             </Button>
           </View>

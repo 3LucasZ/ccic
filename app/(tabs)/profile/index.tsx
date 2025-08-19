@@ -6,7 +6,7 @@ import { Button } from "~/components/ui/button";
 import { Check } from "~/lib/icons/Check";
 import { X } from "~/lib/icons/X";
 import { Tabs, TabsList, TabsTrigger } from "~/components/ui/tabs";
-import { Link } from "expo-router";
+import { Link, router } from "expo-router";
 import { useSession } from "~/lib/ctx";
 
 export default function Screen() {
@@ -51,16 +51,13 @@ export default function Screen() {
             </TabsTrigger>
           </TabsList>
         </Tabs>
-        <Link href="/buddies" asChild>
-          <Button>
-            <Text>Buddies</Text>
-          </Button>
-        </Link>
-        <Link href="/about" asChild>
-          <Button>
-            <Text>About Us</Text>
-          </Button>
-        </Link>
+
+        <Button onPress={() => router.push("/profile/buddies")}>
+          <Text>Buddies</Text>
+        </Button>
+        <Button onPress={() => router.push("/profile/about")}>
+          <Text>About Us</Text>
+        </Button>
       </View>
     </SafeAreaView>
   );

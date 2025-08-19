@@ -49,20 +49,6 @@ export default function TabLayout() {
           tabBarIcon: ({ color, focused }) => <UserRound color={color} />,
         }}
       />
-      <Tabs.Screen
-        name="about"
-        options={{
-          headerShown: false,
-          href: null,
-        }}
-      />
-      <Tabs.Screen
-        name="buddies"
-        options={{
-          headerShown: false,
-          href: null,
-        }}
-      />
     </Tabs>
   );
 }
