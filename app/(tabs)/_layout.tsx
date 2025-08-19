@@ -1,4 +1,4 @@
-import { Tabs } from "expo-router";
+import { Stack, Tabs } from "expo-router";
 import { House } from "lib/icons/House";
 import { BookOpen, MessageSquare, UserRound } from "lucide-react-native";
 import { View } from "react-native";

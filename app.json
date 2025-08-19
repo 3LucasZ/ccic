@@ -17,14 +17,17 @@
       "**/*"
     ],
     "ios": {
+      "usesAppleSignIn": true,
       "supportsTablet": true,
-      "bundleIdentifier": "com.cartesian-bearrr.ccic"
+      "bundleIdentifier": "com.cartesian-bearrr.ccic",
+      "appleTeamId": "XN7QMJBXN2"
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
-      }
+      },
+      "package": "com.cartesianbearrr.ccic"
     },
     "web": {
       "bundler": "metro",
@@ -38,7 +41,9 @@
         {
           "iosUrlScheme": "com.googleusercontent.apps.768678016356-jm2ri85nmj5f4et150ahvlaa1isvt9im"
         }
-      ]
+      ],
+      "expo-apple-authentication",
+      "expo-secure-store"
     ],
     "experiments": {
       "typedRoutes": true

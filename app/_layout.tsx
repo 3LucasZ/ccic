@@ -16,6 +16,8 @@ import { PortalHost } from "@rn-primitives/portal";
 import { ThemeToggle } from "~/components/ThemeToggle";
 import { setAndroidNavigationBar } from "~/lib/android-navigation-bar";
 import { TvIcon } from "lucide-react-native";
+import { SessionProvider } from "~/lib/ctx";
+import { SplashScreenController } from "~/lib/splash";
 
 const LIGHT_THEME: Theme = {
   ...DefaultTheme,
@@ -42,13 +44,28 @@ export default function RootLayout() {
   const { isDarkColorScheme } = useColorScheme();
 
   return (
-    <ThemeProvider value={isDarkColorScheme ? DARK_THEME : LIGHT_THEME}>
-      <StatusBar style={isDarkColorScheme ? "light" : "dark"} />
-      <Stack>
-        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-      </Stack>
-      <PortalHost />
-    </ThemeProvider>
+    <SessionProvider>
+      <ThemeProvider value={isDarkColorScheme ? DARK_THEME : LIGHT_THEME}>
+        <SplashScreenController />
+        <StatusBar style={isDarkColorScheme ? "light" : "dark"} />
+        <RootNavigator />
+        <PortalHost />
+      </ThemeProvider>
+    </SessionProvider>
+  );
+}
+
+function RootNavigator() {
+  return (
+    <Stack>
+      <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+      <Stack.Screen
+        name="sign-in"
+        options={{
+          headerShown: false,
+        }}
+      />
+    </Stack>
   );
 }
 

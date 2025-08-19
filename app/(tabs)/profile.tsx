@@ -7,10 +7,13 @@ import { Check } from "~/lib/icons/Check";
 import { X } from "~/lib/icons/X";
 import { Tabs, TabsList, TabsTrigger } from "~/components/ui/tabs";
 import { Link } from "expo-router";
+import { useSession } from "~/lib/ctx";
 
 export default function Screen() {
-  const avatar_uri = "https://avatars.githubusercontent.com/u/72239682?v=4";
+  const { user } = useSession();
+  console.log(user);
   const name = "Lucas Zheng";
+  const avatar_uri = "https://avatars.githubusercontent.com/u/72239682?v=4";
   const avatar_fallback = "LZ";
   const [value, setValue] = React.useState("account");
   return (
@@ -24,7 +27,7 @@ export default function Screen() {
             </AvatarFallback>
           </Avatar>
           <View className="w-8"></View>
-          <Text className="text-2xl font-semibold">{name}</Text>
+          <Text className="text-2xl font-semibold">{user?.email}</Text>
         </View>
         <Tabs
           value={value}

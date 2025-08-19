@@ -30,7 +30,7 @@ export default function Screen() {
   const [value, setValue] = React.useState("");
   return (
     <View className="flex-col">
-      <Link href={"/signin"} asChild>
+      <Link href={"/sign-in"} asChild>
         <Button>
           <Text>Button</Text>
         </Button>
