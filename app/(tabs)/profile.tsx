@@ -75,6 +75,26 @@ export default function Screen() {
             />
           </View>
         </View>
+        <View className="gap-y-2">
+          <Text className="font-bold text-xl">Buddies</Text>
+          <View className="gap-y-4">
+            <FriendRequest
+              avatar_uri={avatar_uri}
+              avatar_fallback={avatar_fallback}
+              name={name}
+            />
+            <FriendRequest
+              avatar_uri={avatar_uri}
+              avatar_fallback={avatar_fallback}
+              name={name}
+            />
+            <FriendRequest
+              avatar_uri={avatar_uri}
+              avatar_fallback={avatar_fallback}
+              name={name}
+            />
+          </View>
+        </View>
       </View>
     </SafeAreaView>
   );

@@ -24,22 +24,35 @@ import {
   TooltipTrigger,
 } from "~/components/ui/tooltip";
 import { Link } from "expo-router";
+import { Textarea } from "~/components/ui/textarea";
 
 export default function Screen() {
+  const [value, setValue] = React.useState("");
   return (
     <View className="flex-col">
-      <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+      <Link href={"/signin"} asChild>
+        <Button>
+          <Text>Button</Text>
+        </Button>
+      </Link>
+      {/* <ScrollView horizontal showsHorizontalScrollIndicator={false}>
         <View className="flex-row gap-4 p-2">
           {Array.from({ length: 10 }).map((_, index) => (
             <Buddy uri={""} name={"Lucas Zheng"} key={index} />
           ))}
         </View>
-      </ScrollView>
-      <Link href="/write" asChild>
-        <Button>
-          <Text>Write</Text>
-        </Button>
-      </Link>
+      </ScrollView> */}
+      {/* <Textarea
+        // ref={inputRef}
+        placeholder="Write some stuff..."
+        value={value}
+        onChangeText={setValue}
+        aria-labelledby="textareaLabel"
+      />
+      <Button>
+        <Text>Post</Text>
+      </Button> */}
+
       <Card className="w-full">
         <CardHeader>
           <CardTitle>Challenge</CardTitle>
