@@ -11,7 +11,7 @@ import { Button } from "~/components/ui/button";
 import * as Svg from "react-native-svg";
 import { Image } from "expo-image";
 import { useSession } from "~/lib/ctx";
-import { router } from "expo-router";
+import { Link, router } from "expo-router";
 
 export default function Screen() {
   GoogleSignin.configure({
@@ -38,6 +38,9 @@ export default function Screen() {
         <View className="w-full max-w-sm space-y-4 gap-8">
           <GoogleButton />
           <AppleButton />
+          <Link href={"/"} asChild>
+            <Text className="text-slate-400 text-center">Sign in as Guest</Text>
+          </Link>
         </View>
       </View>
     </SafeAreaView>
