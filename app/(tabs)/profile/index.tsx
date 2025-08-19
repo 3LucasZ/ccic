@@ -8,13 +8,12 @@ import { X } from "~/lib/icons/X";
 import { Tabs, TabsList, TabsTrigger } from "~/components/ui/tabs";
 import { Link, router } from "expo-router";
 import { useSession } from "~/lib/ctx";
+import { fallbackFromName } from "~/lib/utils";
 
 export default function Screen() {
-  const { user } = useSession();
+  const { user, signIn, signOut } = useSession();
   console.log(user);
-  const name = "Lucas Zheng";
-  const avatar_uri = "https://avatars.githubusercontent.com/u/72239682?v=4";
-  const avatar_fallback = "LZ";
+
   const [value, setValue] = React.useState("en");
   return (
     <SafeAreaView className="flex-1 p-4">
@@ -23,20 +22,37 @@ export default function Screen() {
           <Avatar alt="" className="w-24 h-24">
             <AvatarImage source={{ uri: user?.user_metadata.picture }} />
             <AvatarFallback>
-              <Text>{avatar_fallback}</Text>
+              <Text>{fallbackFromName(user?.user_metadata.name)}</Text>
             </AvatarFallback>
           </Avatar>
           <View className="w-8"></View>
           <View>
             <Text className="text-2xl font-semibold">
-              {user?.user_metadata.name}
+              {user?.user_metadata.name || "Guest"}
             </Text>
-            <Text className="text-gray-400">{user?.email}</Text>
+            <Text className="text-gray-400">
+              {user?.email || "guest@gmail.com"}
+            </Text>
           </View>
         </View>
-        <Button>
-          <Text>Sign out</Text>
-        </Button>
+        {!user && (
+          <Button
+            onPress={async () => {
+              router.push("/sign-in");
+            }}
+          >
+            <Text>Sign in</Text>
+          </Button>
+        )}
+        {user && (
+          <Button
+            onPress={async () => {
+              await signOut();
+            }}
+          >
+            <Text>Sign out</Text>
+          </Button>
+        )}
         <Tabs
           value={value}
           onValueChange={setValue}

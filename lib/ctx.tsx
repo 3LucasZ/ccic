@@ -78,6 +78,9 @@ export function SessionProvider({ children }: PropsWithChildren) {
         },
         signOut: async () => {
           setSession(null);
+          await GoogleSignin.hasPlayServices();
+          await GoogleSignin.signOut();
+          await supabase.auth.signOut();
         },
         session,
         user,
