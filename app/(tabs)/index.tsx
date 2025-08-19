@@ -32,7 +32,12 @@ export default function Screen() {
     <View className="flex-col">
       <Link href={"/sign-in"} asChild>
         <Button>
-          <Text>Button</Text>
+          <Text>Sign in</Text>
+        </Button>
+      </Link>
+      <Link href={"/experiment"} asChild>
+        <Button>
+          <Text>Experiment</Text>
         </Button>
       </Link>
       {/* <ScrollView horizontal showsHorizontalScrollIndicator={false}>

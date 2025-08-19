@@ -18,7 +18,7 @@ import { setAndroidNavigationBar } from "~/lib/android-navigation-bar";
 import { TvIcon } from "lucide-react-native";
 import { SessionProvider } from "~/lib/ctx";
 import { SplashScreenController } from "~/lib/splash";
-
+import { GestureHandlerRootView } from "react-native-gesture-handler";
 const LIGHT_THEME: Theme = {
   ...DefaultTheme,
   colors: NAV_THEME.light,
@@ -46,10 +46,12 @@ export default function RootLayout() {
   return (
     <SessionProvider>
       <ThemeProvider value={isDarkColorScheme ? DARK_THEME : LIGHT_THEME}>
-        <SplashScreenController />
-        <StatusBar style={isDarkColorScheme ? "light" : "dark"} />
-        <RootNavigator />
-        <PortalHost />
+        <GestureHandlerRootView>
+          <SplashScreenController />
+          <StatusBar style={isDarkColorScheme ? "light" : "dark"} />
+          <RootNavigator />
+          <PortalHost />
+        </GestureHandlerRootView>
       </ThemeProvider>
     </SessionProvider>
   );
