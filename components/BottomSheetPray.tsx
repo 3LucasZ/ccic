@@ -20,7 +20,7 @@ type BottomSheetPrayProps = {};
 const BottomSheetPray = forwardRef<BottomSheet, BottomSheetPrayProps>(
   (props, ref) => {
     const [value, setValue] = useState("");
-    const snapPoints = useMemo(() => ["50%"], []);
+    const snapPoints = useMemo(() => ["60%"], []);
     const handleSheetChanges = useCallback((index: number) => {
       // on close
       if (index == -1) {
@@ -38,10 +38,15 @@ const BottomSheetPray = forwardRef<BottomSheet, BottomSheetPrayProps>(
     );
     const renderFooter = useCallback(
       (props: any) => (
-        <BottomSheetFooter {...props} bottomInset={24}>
-          <Button>
-            <Text>Send</Text>
-          </Button>
+        <BottomSheetFooter {...props}>
+          <View className="flex-row w-full gap-4 p-4">
+            <Button className="flex-1 bg-teal-400">
+              <Text className="">Send</Text>
+            </Button>
+            <Button className="flex-1 bg-red-400" onPress={() => setValue("")}>
+              <Text>Discard</Text>
+            </Button>
+          </View>
         </BottomSheetFooter>
       ),
       []
@@ -56,7 +61,7 @@ const BottomSheetPray = forwardRef<BottomSheet, BottomSheetPrayProps>(
         enablePanDownToClose
         enableDynamicSizing={false}
         //input
-        keyboardBehavior="fillParent"
+        // keyboardBehavior="fillParent"
         // backdrop
         backdropComponent={renderBackdrop}
         //footer
@@ -70,11 +75,14 @@ const BottomSheetPray = forwardRef<BottomSheet, BottomSheetPrayProps>(
         <BottomSheetView>
           <Text className="text-xl font-bold text-center">Prayer Request</Text>
           <BottomSheetTextInput
-            style={styles.input}
-            placeholder="Click here"
+            placeholder="Enter prayer here..."
             value={value}
             onChangeText={setValue}
             multiline
+            className="text-white text-xl px-4"
+            // get rid of red squiggles
+            spellCheck={false}
+            autoCorrect={false}
           />
         </BottomSheetView>
       </BottomSheet>
@@ -82,36 +90,3 @@ const BottomSheetPray = forwardRef<BottomSheet, BottomSheetPrayProps>(
   }
 );
 export default BottomSheetPray;
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    padding: 24,
-    backgroundColor: "grey",
-  },
-  contentContainer: {
-    flex: 1,
-    alignItems: "center",
-  },
-  input: {
-    marginTop: 8,
-    marginBottom: 10,
-    // borderRadius: 10,
-    fontSize: 24,
-    lineHeight: 20,
-    padding: 8,
-    // backgroundColor: "rgba(151, 151, 151, 0.25)",
-    color: "white",
-  },
-  footerContainer: {
-    padding: 12,
-    margin: 12,
-    borderRadius: 12,
-    backgroundColor: "#80f",
-  },
-  footerText: {
-    textAlign: "center",
-    color: "white",
-    fontWeight: "800",
-  },
-});
