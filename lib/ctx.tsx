@@ -1,4 +1,10 @@
-import { use, createContext, type PropsWithChildren, useState } from "react";
+import {
+  use,
+  createContext,
+  type PropsWithChildren,
+  useState,
+  useEffect,
+} from "react";
 import { useStorageState } from "./useStorageState";
 import {
   GoogleSignin,
@@ -9,13 +15,13 @@ import { User } from "@supabase/supabase-js";
 
 const AuthContext = createContext<{
   signIn: () => Promise<void>;
-  signOut: () => void;
+  signOut: () => Promise<void>;
   session?: string | null;
   user?: User | null;
   isLoading: boolean;
 }>({
   signIn: async () => {},
-  signOut: () => null,
+  signOut: async () => {},
   session: null,
   user: null,
   isLoading: false,
@@ -34,7 +40,12 @@ export function useSession() {
 export function SessionProvider({ children }: PropsWithChildren) {
   const [[isLoading, session], setSession] = useStorageState("session");
   const [user, setUser] = useState<User | null>(null);
-
+  useEffect(() => {
+    // Check for an existing session on app load
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setUser(session?.user ?? null);
+    });
+  }, []); // The empty dependency array ensures this runs only once on mount.
   return (
     <AuthContext
       value={{
@@ -48,7 +59,7 @@ export function SessionProvider({ children }: PropsWithChildren) {
                 provider: "google",
                 token: userInfo.data?.idToken,
               });
-              console.log(data);
+              // console.log(data);
               setUser(data.user);
             } else {
               throw new Error("no ID token present!");
@@ -65,10 +76,11 @@ export function SessionProvider({ children }: PropsWithChildren) {
             }
           }
         },
-        signOut: () => {
+        signOut: async () => {
           setSession(null);
         },
         session,
+        user,
         isLoading,
       }}
     >
