@@ -29,6 +29,7 @@ import { supabase } from "~/lib/supabase";
 import { useSession } from "~/lib/ctx";
 import { QueryData } from "@supabase/supabase-js";
 import { Input } from "~/components/ui/input";
+import FAB from "~/components/ui/FAB";
 
 export default function Screen() {
   const { session } = useSession();
@@ -145,14 +146,7 @@ export default function Screen() {
           </TabsContent>
         </Tabs>
       </SafeAreaView>
-      <Pressable
-        disabled={session == null}
-        onPress={handleOpenPress}
-        className="absolute bottom-6 right-6 h-16 w-16 items-center justify-center
-          rounded-full bg-teal-400 disabled:invisible"
-      >
-        <Plus />
-      </Pressable>
+      <FAB disabled={session == null} onPress={handleOpenPress} />
       <BottomSheetPray ref={bottomSheetRef} />
     </GestureHandlerRootView>
   );

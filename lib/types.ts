@@ -14,6 +14,30 @@ export type Database = {
   }
   public: {
     Tables: {
+      posts: {
+        Row: {
+          created_at: string
+          id: number
+          reply_enabled: boolean
+          text: string
+          title: string
+        }
+        Insert: {
+          created_at?: string
+          id?: number
+          reply_enabled?: boolean
+          text?: string
+          title?: string
+        }
+        Update: {
+          created_at?: string
+          id?: number
+          reply_enabled?: boolean
+          text?: string
+          title?: string
+        }
+        Relationships: []
+      }
       prayer_reps: {
         Row: {
           created_at: string
