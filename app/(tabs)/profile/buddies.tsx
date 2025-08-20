@@ -19,21 +19,25 @@ type Buddy = {
   avatar_uri: string;
 };
 
-const users = [
-  { id: 4, name: "Alan Turing", avatar_uri: "https://github.com/github.png" },
+export const fakeUsers = [
+  {
+    id: 4,
+    name: "Alan Turing",
+    avatar_uri: "https://ui.shadcn.com/avatars/01.png",
+  },
   {
     id: 5,
     name: "Grace Hopper",
-    avatar_uri: "https://github.com/facebook.png",
+    avatar_uri: "https://ui.shadcn.com/avatars/02.png",
   },
   {
     id: 6,
     name: "John von Neumann",
-    avatar_uri: "https://github.com/google.png",
+    avatar_uri: "https://ui.shadcn.com/avatars/03.png",
   },
   {
     id: 7,
-    name: "John von Neumann",
+    name: "Chris Lee",
     avatar_uri: "",
   },
 ];
@@ -46,7 +50,7 @@ export default function Screen() {
   const onChangeText = (text: string) => {
     setValue(text);
   };
-  const buddies = users.filter(
+  const buddies = fakeUsers.filter(
     (buddy) => buddy.name.toLowerCase().indexOf(value.toLowerCase()) == 0
   );
 

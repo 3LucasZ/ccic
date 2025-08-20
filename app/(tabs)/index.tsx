@@ -25,21 +25,23 @@ import {
 } from "~/components/ui/tooltip";
 import { Link, router } from "expo-router";
 import { Textarea } from "~/components/ui/textarea";
+import { fakeUsers } from "./profile/buddies";
+import { fallbackFromName } from "~/lib/utils";
 
 export default function Screen() {
   const [value, setValue] = React.useState("");
   return (
     <View className="flex-col">
-      <Button onPress={() => router.push("/experiment")}>
+      {/* <Button onPress={() => router.push("/experiment")}>
         <Text>Experiment</Text>
-      </Button>
-      {/* <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+      </Button> */}
+      <ScrollView horizontal showsHorizontalScrollIndicator={false}>
         <View className="flex-row gap-4 p-2">
-          {Array.from({ length: 10 }).map((_, index) => (
-            <Buddy uri={""} name={"Lucas Zheng"} key={index} />
+          {fakeUsers.map((user) => (
+            <Buddy uri={user.avatar_uri} name={user.name} key={user.id} />
           ))}
         </View>
-      </ScrollView> */}
+      </ScrollView>
       {/* <Textarea
         // ref={inputRef}
         placeholder="Write some stuff..."
@@ -65,8 +67,10 @@ export default function Screen() {
           <CardTitle>Bulletin Board</CardTitle>
         </CardHeader>
         <CardContent>
-          <Text>{"\u2022 Beautiful Day"}</Text>
-          <Text>{"\u2022 Beautiful Day"}</Text>
+          <Text>{"\u2022 7/16-20: Vacation Bible School (VBS)"}</Text>
+          <Text>{"\u2022 8/13: Hope Horizon Flooring Project"}</Text>
+          <Text>{"\u2022 8/2: Country Lane Beautification"}</Text>
+          <Text>{"\u2022 9/2: English congregation new time"}</Text>
         </CardContent>
       </Card>
     </View>
@@ -76,13 +80,14 @@ export default function Screen() {
 function Buddy({ uri, name }: { uri: string; name: string }) {
   return (
     <View className="flex-col">
-      <Avatar alt={""} className="bg-white w-24 h-24">
+      <Avatar alt={""} className="w-20 h-20">
+        <AvatarImage source={{ uri: uri }} />
         <AvatarFallback>
-          <Text>LZ</Text>
+          <Text className="text-xl">{fallbackFromName(name)}</Text>
         </AvatarFallback>
       </Avatar>
       <View className="h-2"></View>
-      <Text className="text-xs w-24" numberOfLines={1}>
+      <Text className="text-xs w-20" numberOfLines={1}>
         {name}
       </Text>
     </View>

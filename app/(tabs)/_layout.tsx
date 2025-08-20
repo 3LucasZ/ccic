@@ -30,6 +30,7 @@ export default function TabLayout() {
         name="pray"
         options={{
           title: "Pray",
+          headerShown: false,
           tabBarIcon: ({ color, focused }) => <MessageSquare color={color} />,
         }}
       />

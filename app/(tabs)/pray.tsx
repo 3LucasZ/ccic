@@ -1,4 +1,5 @@
 import { HeartHandshake } from "~/lib/icons/Hands";
+import { Heart } from "~/lib/icons/Heart";
 import React, { useEffect, useRef, useState } from "react";
 import {
   ActivityIndicator,
@@ -27,16 +28,22 @@ import { Tables } from "~/lib/types";
 import { supabase } from "~/lib/supabase";
 import { useSession } from "~/lib/ctx";
 import { QueryData } from "@supabase/supabase-js";
+import { Input } from "~/components/ui/input";
 
 export default function Screen() {
   const { session } = useSession();
-  const [value, setValue] = React.useState("all");
+  const [selectedTab, setSelectedTab] = React.useState("all");
   const [loading, setLoading] = useState(true);
   const prayerReqsQuery = supabase
     .from("prayer_reqs")
-    .select("*, author:users(*)");
+    .select("*, author:users(*)")
+    .order("created_at", { ascending: false });
   type PrayerReqs = QueryData<typeof prayerReqsQuery>;
   const [prayers, setPrayers] = useState<PrayerReqs>([]);
+  const [value, setValue] = React.useState("");
+  const onChangeText = (text: string) => {
+    setValue(text);
+  };
 
   useEffect(() => {
     async function getData() {
@@ -44,7 +51,7 @@ export default function Screen() {
       setLoading(true);
       setPrayers([]);
       const { data, error } = await prayerReqsQuery;
-      console.log(data);
+      // console.log(data);
       if (data) {
         setPrayers(data);
       }
@@ -77,9 +84,15 @@ export default function Screen() {
   return (
     <GestureHandlerRootView>
       <SafeAreaView className="flex-1">
-        <Tabs
+        <Input
+          placeholder="Search"
           value={value}
-          onValueChange={setValue}
+          onChangeText={onChangeText}
+          className=" mb-4"
+        />
+        <Tabs
+          value={selectedTab}
+          onValueChange={setSelectedTab}
           className="w-full flex-col gap-2"
         >
           <TabsList className="flex-row w-full">
@@ -155,6 +168,11 @@ function Prayer({
   text: string;
   date: Date;
 }) {
+  const [starred, setStarred] = useState(false);
+  const toggleStarred = () => {
+    setStarred(!starred);
+  };
+  const starStyle = starred ? "text-rose-400 fill-rose-400" : "text-white";
   return (
     <Card>
       {/* Use CardHeader for titles and avatars. Use flex-row for layout. */}
@@ -180,9 +198,9 @@ function Prayer({
         </View>
 
         {/* Wrap interactive icons in a Button for better UX */}
-        <Button variant="secondary" size="icon" className="w-12 h-12">
-          <HeartHandshake className="text-rose-400" size={28} />
-        </Button>
+        <Pressable className="w-12 h-12" onPress={toggleStarred}>
+          <Heart className={starStyle} size={32} />
+        </Pressable>
       </CardHeader>
 
       <CardContent className="p-4 pt-0">

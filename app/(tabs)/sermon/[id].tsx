@@ -1,4 +1,4 @@
-import { Link } from "expo-router";
+import { Link, router, useLocalSearchParams } from "expo-router";
 import { useSQLiteContext } from "expo-sqlite";
 import { useEffect, useState } from "react";
 import {
@@ -36,7 +36,8 @@ export default function Screen() {
   const db = useSQLiteContext();
   const [loading, setLoading] = useState(true);
   const [sermons, setSermons] = useState<Tables<"sermons">[]>([]);
-  const [index, setIndex] = useState(0);
+  const local = useLocalSearchParams();
+  const [index, setIndex] = useState(parseInt(local.id));
   const sermon = sermons?.[index];
   const [passageText, setPassageText] = useState("");
 
@@ -44,7 +45,10 @@ export default function Screen() {
     async function getData() {
       setLoading(true);
       setSermons([]);
-      const { data, error } = await supabase.from("sermons").select();
+      const { data, error } = await supabase
+        .from("sermons")
+        .select()
+        .order("date", { ascending: false });
       if (data) {
         setSermons(data);
       }
@@ -109,11 +113,14 @@ export default function Screen() {
         >
           <ChevronLeft className="text-white" />
         </Button>
+
         <View className="flex-1 items-center">
           <Text className="text-xl font-bold text-center">{sermon.title}</Text>
-          <Text className="text-muted-foreground">
-            {dateToStr(new Date(sermon.date!))}
-          </Text>
+          <Pressable onPress={() => router.push("/sermon/all")}>
+            <Text className="text-muted-foreground">
+              {dateToStr(new Date(sermon.date!))}
+            </Text>
+          </Pressable>
         </View>
         <Button
           onPress={handleNext}
