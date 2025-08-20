@@ -30,9 +30,9 @@ export default function Screen() {
   const [value, setValue] = React.useState("");
   return (
     <View className="flex-col">
-      {/* <Button onPress={() => router.push("/sign-in")}>
+      <Button onPress={() => router.push("/experiment")}>
         <Text>Experiment</Text>
-      </Button> */}
+      </Button>
       {/* <ScrollView horizontal showsHorizontalScrollIndicator={false}>
         <View className="flex-row gap-4 p-2">
           {Array.from({ length: 10 }).map((_, index) => (

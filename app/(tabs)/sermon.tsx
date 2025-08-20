@@ -2,13 +2,28 @@ import { useSQLiteContext } from "expo-sqlite";
 import { useEffect, useState } from "react";
 import {
   ActivityIndicator,
+  Pressable,
   SafeAreaView,
   ScrollView,
+  TouchableOpacity,
   View,
 } from "react-native";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "~/components/ui/accordion";
 import { Button } from "~/components/ui/button";
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "~/components/ui/collapsible";
 import { Text } from "~/components/ui/text";
 import { getBibleTextAsync, getBibleTextSync } from "~/lib/bible";
+import { dateToStr } from "~/lib/datetime";
+import { ChevronDown } from "~/lib/icons/ChevronDown";
 import { ChevronLeft } from "~/lib/icons/ChevronLeft";
 import { ChevronRight } from "~/lib/icons/ChevronRight";
 import { Download } from "~/lib/icons/Download";
@@ -84,7 +99,9 @@ export default function Screen() {
         </Button>
         <View className="flex-1 items-center">
           <Text className="text-xl font-bold text-center">{sermon.title}</Text>
-          <Text className="text-muted-foreground">{sermon.date}</Text>
+          <Text className="text-muted-foreground">
+            {dateToStr(new Date(sermon.date!))}
+          </Text>
         </View>
         <Button
           onPress={handleNext}
@@ -109,12 +126,7 @@ export default function Screen() {
         <View className="gap-y-4">
           <View>
             <Text className="text-lg font-semibold mb-1">Passage</Text>
-            <Text className="text-base text-muted-foreground">
-              {sermon.passage}
-            </Text>
-            <Text className="text-base text-muted-foreground">
-              {passageText}
-            </Text>
+            <PassageText passage={sermon.passage} text={passageText} />
           </View>
           <View>
             <Text className="text-lg font-semibold mb-1">Summary</Text>
@@ -128,5 +140,31 @@ export default function Screen() {
         <View className="h-8"></View>
       </ScrollView>
     </SafeAreaView>
+  );
+}
+
+function PassageText({ passage, text }: { passage: string; text: string }) {
+  const [isExpanded, setIsExpanded] = useState(false);
+  const toggleExpand = () => {
+    setIsExpanded(!isExpanded);
+  };
+  const arrowRotation = isExpanded ? "rotate-180" : "rotate-0";
+  const lineClamp = isExpanded ? "line-clamp-none" : "line-clamp-3";
+  return (
+    <View>
+      <Pressable
+        onPress={toggleExpand}
+        className="flex-row justify-between items-center"
+      >
+        <Text className="text-muted-foreground font-semibold">{passage}</Text>
+        <ChevronDown
+          size={22}
+          color={"white"}
+          className={`transition-transform duration-300 ${arrowRotation}`}
+        />
+      </Pressable>
+
+      <Text className={`text-muted-foreground ${lineClamp}`}>{text}</Text>
+    </View>
   );
 }
