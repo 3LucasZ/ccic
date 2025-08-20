@@ -33,9 +33,10 @@ export default function Screen() {
       if (data) {
         setSermons(data);
         if (data.length > 0) {
-          const sermon = sermons[0];
-          console.log("SQLite...");
-          setPassageText(await getBibleText(sermon.passage, db));
+          const sermon = data[0];
+          if (sermon.passage) {
+            setPassageText(await getBibleText(sermon.passage, db));
+          }
         }
       }
       if (error) {

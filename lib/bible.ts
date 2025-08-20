@@ -2,9 +2,7 @@ import { SQLiteDatabase } from "expo-sqlite";
 
 export async function getBibleText(references: string, db: SQLiteDatabase) {
     const q = generateBibleQuery(references);
-    // console.log(q);
     const passageTextQuery = await db.getAllAsync(q);
-    // console.log(passageTextQuery);
     const stringArray: string[] = passageTextQuery.map(item => item.text);
     const singleString: string = stringArray.join("");
     return singleString
