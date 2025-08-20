@@ -14,6 +14,48 @@ export type Database = {
   }
   public: {
     Tables: {
+      prayer_reps: {
+        Row: {
+          created_at: string
+          id: number
+          text: string
+          visibility: number
+        }
+        Insert: {
+          created_at?: string
+          id?: number
+          text?: string
+          visibility?: number
+        }
+        Update: {
+          created_at?: string
+          id?: number
+          text?: string
+          visibility?: number
+        }
+        Relationships: []
+      }
+      prayer_reqs: {
+        Row: {
+          author_id: string
+          created_at: string
+          id: number
+          text: string
+        }
+        Insert: {
+          author_id?: string
+          created_at?: string
+          id?: number
+          text?: string
+        }
+        Update: {
+          author_id?: string
+          created_at?: string
+          id?: number
+          text?: string
+        }
+        Relationships: []
+      }
       sermons: {
         Row: {
           application: string
