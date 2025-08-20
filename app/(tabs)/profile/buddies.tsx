@@ -11,6 +11,7 @@ import { useSession } from "~/lib/ctx";
 import { fallbackFromName } from "~/lib/utils";
 import { ChevronLeft } from "~/lib/icons/ChevronLeft";
 import ChevronHeader from "~/components/ChevronHeader";
+import { Input } from "~/components/ui/input";
 
 type Buddy = {
   id: number;
@@ -18,7 +19,7 @@ type Buddy = {
   avatar_uri: string;
 };
 
-const buddies = [
+const users = [
   { id: 4, name: "Alan Turing", avatar_uri: "https://github.com/github.png" },
   {
     id: 5,
@@ -37,13 +38,32 @@ const buddies = [
   },
 ];
 export default function Screen() {
-  const { user } = useSession();
-  console.log(user);
-  const [value, setValue] = React.useState("buddies");
+  const { session } = useSession();
+  const user = session?.user;
+  // console.log(user);
+  const [selectedTab, setSelectedTab] = React.useState("buddies");
+  const [value, setValue] = React.useState("");
+  const onChangeText = (text: string) => {
+    setValue(text);
+  };
+  const buddies = users.filter(
+    (buddy) => buddy.name.toLowerCase().indexOf(value.toLowerCase()) == 0
+  );
+
   return (
     <SafeAreaView className="flex-1 p-4">
       <ChevronHeader title="My Buddies" />
-      <Tabs className="flex-1" value={value} onValueChange={setValue}>
+      <Input
+        placeholder="Search"
+        value={value}
+        onChangeText={onChangeText}
+        className="mx-4 mb-4"
+      />
+      <Tabs
+        className="flex-1"
+        value={selectedTab}
+        onValueChange={setSelectedTab}
+      >
         <TabsList className="flex-row mx-4">
           <TabsTrigger value="buddies" className="flex-1">
             <Text>Buddies</Text>
@@ -59,7 +79,11 @@ export default function Screen() {
           <UserList
             users={buddies}
             actions={(user: Buddy) => <BuddyActions user={user} />}
-            emptyStateMessage="You haven't added any buddies yet."
+            emptyStateMessage={
+              buddies
+                ? "No users matched your search."
+                : "You haven't added any buddies yet."
+            }
           />
         </TabsContent>
 
@@ -68,16 +92,25 @@ export default function Screen() {
           <UserList
             users={buddies}
             actions={(user) => <RequestActions user={user} />}
-            emptyStateMessage="You have no new buddy requests."
+            emptyStateMessage={
+              buddies
+                ? "No users matched your search."
+                : "You have no new buddy requests."
+            }
           />
         </TabsContent>
 
         {/* Pending Tab */}
+        {/* TODO: you should be able to send requests in this tab too! */}
         <TabsContent value="pending" className="flex-1 p-4">
           <UserList
             users={buddies}
             actions={(user) => <PendingActions user={user} />}
-            emptyStateMessage="You have no pending requests."
+            emptyStateMessage={
+              buddies
+                ? "No users matched your search."
+                : "You have no pending requests."
+            }
           />
         </TabsContent>
       </Tabs>
@@ -137,7 +170,7 @@ function UserListItem({
 
 function EmptyState({ message }: { message: string }) {
   return (
-    <View className="flex-1 items-center justify-center">
+    <View className="items-center justify-center">
       <Text className="text-muted-foreground">{message}</Text>
     </View>
   );
