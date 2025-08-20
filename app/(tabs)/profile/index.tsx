@@ -11,7 +11,8 @@ import { useSession } from "~/lib/ctx";
 import { fallbackFromName } from "~/lib/utils";
 
 export default function Screen() {
-  const { user, signIn, signOut } = useSession();
+  const { session, signIn, signOut } = useSession();
+  const user = session?.user;
   console.log(user);
 
   const [value, setValue] = React.useState("en");
@@ -48,6 +49,7 @@ export default function Screen() {
           <Button
             onPress={async () => {
               await signOut();
+              router.push("/sign-in");
             }}
           >
             <Text>Sign out</Text>

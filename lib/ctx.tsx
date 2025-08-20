@@ -11,19 +11,18 @@ import {
   statusCodes,
 } from "@react-native-google-signin/google-signin";
 import { supabase } from "./supabase";
-import { User } from "@supabase/supabase-js";
+import { Session, User } from "@supabase/supabase-js";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const AuthContext = createContext<{
   signIn: () => Promise<void>;
   signOut: () => Promise<void>;
-  session?: string | null;
-  user?: User | null;
+  session?: Session | null;
   isLoading: boolean;
 }>({
   signIn: async () => {},
   signOut: async () => {},
   session: null,
-  user: null,
   isLoading: false,
 });
 
@@ -33,19 +32,18 @@ export function useSession() {
   if (!value) {
     throw new Error("useSession must be wrapped in a <SessionProvider />");
   }
-
   return value;
 }
 
 export function SessionProvider({ children }: PropsWithChildren) {
-  const [[isLoading, session], setSession] = useStorageState("session");
-  const [user, setUser] = useState<User | null>(null);
-  useEffect(() => {
-    // Check for an existing session on app load
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setUser(session?.user ?? null);
-    });
-  }, []); // The empty dependency array ensures this runs only once on mount.
+  // session storage
+  const sessionStorageKey = "session";
+  const [[isLoading, sessionStr], setSessionStr] =
+    useStorageState(sessionStorageKey);
+  const session = sessionStr ? JSON.parse(sessionStr) : null;
+  // (Later if necessary) The empty dependency array ensures this runs only once on mount.
+  useEffect(() => {}, []);
+  // return
   return (
     <AuthContext
       value={{
@@ -57,10 +55,19 @@ export function SessionProvider({ children }: PropsWithChildren) {
             if (userInfo.data?.idToken) {
               const { data, error } = await supabase.auth.signInWithIdToken({
                 provider: "google",
-                token: userInfo.data?.idToken,
+                token: userInfo.data.idToken,
               });
-              // console.log(data);
-              setUser(data.user);
+              // console.log(data.session);
+              setSessionStr(JSON.stringify(data.session));
+              try {
+                // console.log("insert:", data.user);
+                await supabase.from("users").insert({
+                  id: data.user?.id,
+                  name: data.user?.user_metadata.name,
+                  email: data.user?.email,
+                  uri: data.user?.user_metadata.picture,
+                });
+              } catch {}
             } else {
               throw new Error("no ID token present!");
             }
@@ -77,13 +84,12 @@ export function SessionProvider({ children }: PropsWithChildren) {
           }
         },
         signOut: async () => {
-          setSession(null);
+          setSessionStr("");
+          await supabase.auth.signOut();
           await GoogleSignin.hasPlayServices();
           await GoogleSignin.signOut();
-          await supabase.auth.signOut();
         },
         session,
-        user,
         isLoading,
       }}
     >

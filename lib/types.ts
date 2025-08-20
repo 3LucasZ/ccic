@@ -54,7 +54,15 @@ export type Database = {
           id?: number
           text?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "prayer_reqs_author_id_fkey"
+            columns: ["author_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       sermons: {
         Row: {
@@ -83,6 +91,27 @@ export type Database = {
           series?: string
           summary?: string
           title?: string
+        }
+        Relationships: []
+      }
+      users: {
+        Row: {
+          email: string
+          id: string
+          name: string
+          uri: string
+        }
+        Insert: {
+          email?: string
+          id?: string
+          name?: string
+          uri?: string
+        }
+        Update: {
+          email?: string
+          id?: string
+          name?: string
+          uri?: string
         }
         Relationships: []
       }

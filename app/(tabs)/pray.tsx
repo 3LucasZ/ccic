@@ -1,13 +1,11 @@
 import { HeartHandshake } from "~/lib/icons/Hands";
-import React, { useCallback, useMemo, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import {
+  ActivityIndicator,
   Pressable,
   SafeAreaView,
   ScrollView,
   View,
-  StyleSheet,
-  TouchableWithoutFeedback,
-  Keyboard,
 } from "react-native";
 import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar";
 import { Button } from "~/components/ui/button";
@@ -15,32 +13,57 @@ import {
   Card,
   CardContent,
   CardDescription,
-  CardFooter,
   CardHeader,
   CardTitle,
 } from "~/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "~/components/ui/tabs";
 import { Text } from "~/components/ui/text";
-import { Check, Plus } from "lucide-react-native";
+import { Plus } from "lucide-react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
-import BottomSheet, {
-  BottomSheetBackdrop,
-  BottomSheetTextInput,
-  BottomSheetView,
-} from "@gorhom/bottom-sheet";
-import { Textarea } from "~/components/ui/textarea";
+import BottomSheet from "@gorhom/bottom-sheet";
 import BottomSheetPray from "~/components/BottomSheetPray";
+import { Tables } from "~/lib/types";
+import { supabase } from "~/lib/supabase";
+import { useSession } from "~/lib/ctx";
 
 export default function Screen() {
+  const { session } = useSession();
   const [value, setValue] = React.useState("all");
+  const [loading, setLoading] = useState(true);
+  const [prayers, setPrayers] = useState<Tables<"prayer_reqs">[]>([]);
+
+  useEffect(() => {
+    async function getData() {
+      // Reset state and start loading
+      setLoading(true);
+      setPrayers([]);
+      const { data, error } = await supabase
+        .from("prayer_reqs")
+        .select("*, users(*)");
+      console.log(data);
+      if (data) {
+        setPrayers(data);
+      }
+      if (error) {
+        console.error("Error fetching prayers:", error);
+      }
+      setLoading(false);
+    }
+
+    getData();
+  }, []);
   // bottom sheet
   const bottomSheetRef = useRef<BottomSheet>(null);
   const handleClosePress = () => bottomSheetRef.current?.close();
   const handleOpenPress = () => bottomSheetRef.current?.expand();
-
+  if (loading) {
+    return (
+      <SafeAreaView className="flex-1 justify-center items-center">
+        <ActivityIndicator size="large" />
+      </SafeAreaView>
+    );
+  }
   return (
-    // Keyboard.dismiss in case the keyboard glitches during bottom sheet
-    // <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
     <GestureHandlerRootView>
       <SafeAreaView className="flex-1">
         <Tabs
@@ -65,13 +88,12 @@ export default function Screen() {
           <TabsContent value="all">
             <ScrollView showsVerticalScrollIndicator={false}>
               <View className="gap-2">
-                {Array.from({ length: 10 }).map((_, index) => (
+                {prayers.map((prayer) => (
                   <Prayer
-                    name={"LZ"}
-                    avatar_uri={""}
-                    text={"My prayer request"}
+                    name={"prayer.text"}
+                    avatar_uri="LZ"
+                    text={prayer.text}
                     date={new Date()}
-                    key={index}
                   />
                 ))}
                 <View className="h-36"></View>
@@ -90,15 +112,15 @@ export default function Screen() {
         </Tabs>
       </SafeAreaView>
       <Pressable
+        disabled={session == null}
         onPress={handleOpenPress}
         className="absolute bottom-6 right-6 h-16 w-16 items-center justify-center
-          rounded-full bg-teal-400 "
+          rounded-full bg-teal-400 disabled:invisible"
       >
         <Plus />
       </Pressable>
       <BottomSheetPray ref={bottomSheetRef} />
     </GestureHandlerRootView>
-    // </TouchableWithoutFeedback>
   );
 }
 function Prayer({

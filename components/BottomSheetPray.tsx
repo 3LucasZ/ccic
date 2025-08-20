@@ -16,12 +16,22 @@ import {
 import { Text } from "components/ui/text";
 import { Keyboard, StyleSheet, View } from "react-native";
 import { Button } from "./ui/button";
+import { supabase } from "~/lib/supabase";
+import { useSession } from "~/lib/ctx";
 type BottomSheetPrayProps = {};
 const BottomSheetPray = forwardRef<BottomSheet, BottomSheetPrayProps>(
   (props, ref) => {
-    const [value, setValue] = useState("");
+    const { session } = useSession();
+    const user = session?.user;
+    const [prayerText, setPrayerText] = useState("");
+    const onSubmit = async () => {
+      console.log(prayerText);
+      await supabase
+        .from("prayer_reqs")
+        .insert({ author_id: user?.id, text: prayerText });
+    };
     const snapPoints = useMemo(() => ["60%"], []);
-    const handleClosePress = () => ref.current?.close();
+    const handleClosePress = () => ref?.current?.close();
     const handleSheetChanges = useCallback((index: number) => {
       // on close
       if (index == -1) {
@@ -42,13 +52,24 @@ const BottomSheetPray = forwardRef<BottomSheet, BottomSheetPrayProps>(
       (props: any) => (
         <BottomSheetFooter {...props}>
           <View className="flex-row w-full gap-4 p-4">
-            <Button className="flex-1 bg-teal-400">
+            <Button
+              className="flex-1 bg-teal-400"
+              onPress={async () => {
+                if (prayerText.trim() === "") {
+                  alert("Prayer request is empty.");
+                  return;
+                }
+                await onSubmit();
+                setPrayerText("");
+                handleClosePress();
+              }}
+            >
               <Text className="">Send</Text>
             </Button>
             <Button
               className="flex-1 bg-red-400"
               onPress={() => {
-                setValue("");
+                setPrayerText("");
                 handleClosePress();
               }}
             >
@@ -57,7 +78,8 @@ const BottomSheetPray = forwardRef<BottomSheet, BottomSheetPrayProps>(
           </View>
         </BottomSheetFooter>
       ),
-      []
+      // CRUCIAL: or else send will not work!
+      [prayerText]
     );
     return (
       <BottomSheet
@@ -84,8 +106,8 @@ const BottomSheetPray = forwardRef<BottomSheet, BottomSheetPrayProps>(
           <Text className="text-xl font-bold text-center">Prayer Request</Text>
           <BottomSheetTextInput
             placeholder="Enter prayer here..."
-            value={value}
-            onChangeText={setValue}
+            value={prayerText}
+            onChangeText={setPrayerText}
             multiline
             className="text-white text-xl px-4"
             // get rid of red squiggles
