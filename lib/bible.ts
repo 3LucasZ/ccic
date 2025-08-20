@@ -35,12 +35,12 @@ export function generateBibleQuery(references: string): string {
         startVerse = start;
         endVerse = end;
         conditions.push(
-          `(book_id = '${bookName}' AND chapter = ${startChapter} AND verse BETWEEN ${startVerse} AND ${endVerse})`
+          `(b.name = '${bookName}' AND bv.chapter = ${startChapter} AND bv.verse BETWEEN ${startVerse} AND ${endVerse})`
         );
       } else {
         // It's a single verse (e.g., 13:3)
         conditions.push(
-          `(book_id = '${bookName}' AND chapter = ${startChapter} AND verse = ${startVerse})`
+          `(b.name = '${bookName}' AND bv.chapter = ${startChapter} AND bv.verse = ${startVerse})`
         );
       }
     } else if (chapterVersePart.includes('-')) {
@@ -51,17 +51,17 @@ export function generateBibleQuery(references: string): string {
 
       // Construct a precise WHERE clause for the chapter range
       conditions.push(
-        `(book_id = '${bookName}' AND (` +
-        `(chapter = ${startChapter} AND verse >= ${startVerse}) OR ` +
-        `(chapter = ${endChapter} AND verse <= ${endVerse}) OR ` +
-        `(chapter > ${startChapter} AND chapter < ${endChapter})` +
+        `(b.name = '${bookName}' AND (` +
+        `(bv.chapter = ${startChapter} AND bv.verse >= ${startVerse}) OR ` +
+        `(bv.chapter = ${endChapter} AND bv.verse <= ${endVerse}) OR ` +
+        `(bv.chapter > ${startChapter} AND bv.chapter < ${endChapter})` +
         `))`
       );
     } else {
       // It's a full chapter reference (e.g., 12)
       const chapter = parseInt(chapterVersePart);
       conditions.push(
-        `(book_id = '${bookName}' AND chapter = ${chapter})`
+        `(b.name = '${bookName}' AND bv.chapter = ${chapter})`
       );
     }
   }
@@ -69,6 +69,6 @@ export function generateBibleQuery(references: string): string {
   // Combine all conditions with 'OR'
   const whereClause = conditions.join(' OR ');
 
-  // Return the complete SQL query
-  return `SELECT text FROM ASV_verses WHERE ${whereClause};`;
+  // Construct the final query with a JOIN clause
+  return `SELECT bv.text FROM ASV_verses AS bv JOIN ASV_books AS b ON bv.book_id = b.id WHERE ${whereClause};`;
 }
