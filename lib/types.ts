@@ -73,6 +73,7 @@ export type Database = {
           series: string
           summary: string
           title: string
+          yt_uri: string | null
         }
         Insert: {
           application?: string
@@ -82,6 +83,7 @@ export type Database = {
           series?: string
           summary?: string
           title?: string
+          yt_uri?: string | null
         }
         Update: {
           application?: string
@@ -91,6 +93,7 @@ export type Database = {
           series?: string
           summary?: string
           title?: string
+          yt_uri?: string | null
         }
         Relationships: []
       }

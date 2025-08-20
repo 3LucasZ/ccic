@@ -1,7 +1,9 @@
+import { Link } from "expo-router";
 import { useSQLiteContext } from "expo-sqlite";
 import { useEffect, useState } from "react";
 import {
   ActivityIndicator,
+  Linking,
   Pressable,
   SafeAreaView,
   ScrollView,
@@ -85,7 +87,17 @@ export default function Screen() {
       </SafeAreaView>
     );
   }
-
+  const watch = async () => {
+    if (!sermon.yt_uri) return;
+    // Check if the device can open the URL
+    const supported = await Linking.canOpenURL(sermon.yt_uri);
+    if (supported) {
+      await Linking.openURL(sermon.yt_uri);
+    } else {
+      // console.log(`Don't know how to open this URL: ${sermon.yt_uri}`);
+      alert(`Cannot open this URL: ${sermon.yt_uri}`);
+    }
+  };
   return (
     <SafeAreaView className="flex-1">
       <View className="flex-row items-center justify-between pb-4">
@@ -114,7 +126,7 @@ export default function Screen() {
       </View>
       <ScrollView contentContainerClassName="px-4 gap-y-6">
         <View className="flex-row gap-x-4">
-          <Button className="flex-1">
+          <Button className="flex-1" onPress={watch} disabled={!sermon.yt_uri}>
             <Text>Watch on YouTube</Text>
           </Button>
           <Button variant="secondary" className="">
