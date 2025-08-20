@@ -13,7 +13,7 @@ import { fallbackFromName } from "~/lib/utils";
 export default function Screen() {
   const { session, signIn, signOut } = useSession();
   const user = session?.user;
-  console.log(user);
+  // console.log(user);
 
   const [value, setValue] = React.useState("en");
   return (

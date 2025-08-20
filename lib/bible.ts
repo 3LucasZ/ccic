@@ -1,11 +1,32 @@
 import { SQLiteDatabase } from "expo-sqlite";
 
-export async function getBibleText(references: string, db: SQLiteDatabase) {
-    const q = generateBibleQuery(references);
-    const passageTextQuery = await db.getAllAsync(q);
-    const stringArray: string[] = passageTextQuery.map(item => item.text);
-    const singleString: string = stringArray.join("");
-    return singleString
+export function getBibleTextSync(references: string, db: SQLiteDatabase) {
+  var q;
+  try {
+    q = generateBibleQuery(references);
+  } catch {
+    return "";
+  }
+  const passageTextQuery = db.getAllSync(q);
+  const stringArray: string[] = passageTextQuery.map((item) => item.text);
+  const singleString: string = stringArray.join("");
+  return singleString;
+}
+
+export async function getBibleTextAsync(
+  references: string,
+  db: SQLiteDatabase
+) {
+  var q;
+  try {
+    q = generateBibleQuery(references);
+  } catch {
+    return "";
+  }
+  const passageTextQuery = await db.getAllAsync(q);
+  const stringArray: string[] = passageTextQuery.map((item) => item.text);
+  const singleString: string = stringArray.join("");
+  return singleString;
 }
 
 /**
@@ -15,16 +36,20 @@ export async function getBibleText(references: string, db: SQLiteDatabase) {
  * @param references - A comma-separated string of Bible references (e.g., "Matthew 17:1-13, Matthew 18:1-19:1, Romans 12, Romans 13:3").
  * @returns A complete SQL query string.
  */
-export function generateBibleQuery(references: string): string {
+function generateBibleQuery(references: string): string {
   // Split the input string by commas to get individual references
-  const individualRefs = references.split(',').map(ref => ref.trim()).filter(ref => ref.length > 0);
+  const individualRefs = references
+    .split(",")
+    .map((ref) => ref.trim())
+    .filter((ref) => ref.length > 0);
 
   const conditions: string[] = [];
 
   for (const ref of individualRefs) {
     // Find the last space to separate the book name from the chapter/verse part
-    const lastSpaceIndex = ref.lastIndexOf(' ');
+    const lastSpaceIndex = ref.lastIndexOf(" ");
     if (lastSpaceIndex === -1) {
+      throw `Invalid reference format: ${ref}`;
       console.error(`Invalid reference format: ${ref}`);
       continue;
     }
@@ -33,15 +58,15 @@ export function generateBibleQuery(references: string): string {
     const chapterVersePart = ref.substring(lastSpaceIndex + 1).trim();
 
     // Check for a colon to see if it's a specific verse or verse range
-    if (chapterVersePart.includes(':')) {
+    if (chapterVersePart.includes(":")) {
       // It's a chapter and verse reference
-      const [startChapter, versePart] = chapterVersePart.split(':');
+      const [startChapter, versePart] = chapterVersePart.split(":");
       let startVerse = parseInt(versePart);
       let endVerse = startVerse;
 
       // Check if it's a verse range (e.g., 17:1-13)
-      if (versePart.includes('-')) {
-        const [start, end] = versePart.split('-').map(v => parseInt(v));
+      if (versePart.includes("-")) {
+        const [start, end] = versePart.split("-").map((v) => parseInt(v));
         startVerse = start;
         endVerse = end;
         conditions.push(
@@ -53,32 +78,50 @@ export function generateBibleQuery(references: string): string {
           `(b.name = '${bookName}' AND bv.chapter = ${startChapter} AND bv.verse = ${startVerse})`
         );
       }
-    } else if (chapterVersePart.includes('-')) {
+    } else if (chapterVersePart.includes("-")) {
       // It's a chapter-to-chapter range with verses (e.g., 18:1-19:1)
-      const [start, end] = chapterVersePart.split('-');
-      const [startChapter, startVerse] = start.split(':').map(Number);
-      const [endChapter, endVerse] = end.split(':').map(Number);
+      const [start, end] = chapterVersePart.split("-");
+      const [startChapter, startVerse] = start.split(":").map(Number);
+      const [endChapter, endVerse] = end.split(":").map(Number);
 
       // Construct a precise WHERE clause for the chapter range
       conditions.push(
         `(b.name = '${bookName}' AND (` +
-        `(bv.chapter = ${startChapter} AND bv.verse >= ${startVerse}) OR ` +
-        `(bv.chapter = ${endChapter} AND bv.verse <= ${endVerse}) OR ` +
-        `(bv.chapter > ${startChapter} AND bv.chapter < ${endChapter})` +
-        `))`
+          `(bv.chapter = ${startChapter} AND bv.verse >= ${startVerse}) OR ` +
+          `(bv.chapter = ${endChapter} AND bv.verse <= ${endVerse}) OR ` +
+          `(bv.chapter > ${startChapter} AND bv.chapter < ${endChapter})` +
+          `))`
       );
     } else {
       // It's a full chapter reference (e.g., 12)
       const chapter = parseInt(chapterVersePart);
-      conditions.push(
-        `(b.name = '${bookName}' AND bv.chapter = ${chapter})`
-      );
+      conditions.push(`(b.name = '${bookName}' AND bv.chapter = ${chapter})`);
     }
   }
 
   // Combine all conditions with 'OR'
-  const whereClause = conditions.join(' OR ');
+  const whereClause = conditions.join(" OR ");
 
   // Construct the final query with a JOIN clause
   return `SELECT bv.text FROM ASV_verses AS bv JOIN ASV_books AS b ON bv.book_id = b.id WHERE ${whereClause};`;
+}
+
+// TODO
+function isBibleReferenceFormat(text: string): boolean {
+  // Regex to validate a single Bible reference.
+  // It looks for:
+  // 1. One or more letters and spaces (for the book name).
+  // 2. A space.
+  // 3. One or more digits (for the chapter number).
+  // 4. Optionally, a colon followed by a verse or verse range.
+  //    - `:\d+`: A colon and one or more digits for a verse.
+  //    - `(?:-\d+)?`: An optional hyphen and digits for a verse range.
+  const regex = /^[A-Za-z\s]+\s\d+(?::\d+(?:-\d+)?)?$/;
+
+  // Split the input string by commas and trim whitespace from each part.
+  const references = text.split(",").map((ref) => ref.trim());
+
+  // Check if every part of the string matches the regex.
+  // The `every()` method returns `true` only if all elements pass the test.
+  return references.every((ref) => regex.test(ref));
 }

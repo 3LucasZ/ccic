@@ -8,7 +8,7 @@ import {
 } from "react-native";
 import { Button } from "~/components/ui/button";
 import { Text } from "~/components/ui/text";
-import { generateBibleQuery, getBibleText } from "~/lib/bible";
+import { getBibleTextAsync, getBibleTextSync } from "~/lib/bible";
 import { ChevronLeft } from "~/lib/icons/ChevronLeft";
 import { ChevronRight } from "~/lib/icons/ChevronRight";
 import { Download } from "~/lib/icons/Download";
@@ -19,25 +19,17 @@ export default function Screen() {
   const db = useSQLiteContext();
   const [loading, setLoading] = useState(true);
   const [sermons, setSermons] = useState<Tables<"sermons">[]>([]);
-  const [passageText, setPassageText] = useState("");
   const [index, setIndex] = useState(0);
+  const sermon = sermons?.[index];
+  const [passageText, setPassageText] = useState("");
 
   useEffect(() => {
     async function getData() {
-      // Reset state and start loading
       setLoading(true);
       setSermons([]);
-
       const { data, error } = await supabase.from("sermons").select();
-
       if (data) {
         setSermons(data);
-        if (data.length > 0) {
-          const sermon = data[0];
-          if (sermon.passage) {
-            setPassageText(await getBibleText(sermon.passage, db));
-          }
-        }
       }
       if (error) {
         console.error("Error fetching sermons:", error);
@@ -46,8 +38,16 @@ export default function Screen() {
     }
     getData();
   }, []);
+  useEffect(() => {
+    async function getData() {
+      if (sermon?.passage) {
+        setPassageText(await getBibleTextAsync(sermon.passage, db));
+      }
+    }
+    getData();
+  }),
+    [sermon];
 
-  const sermon = sermons?.[index];
   const handlePrev = () => {
     setIndex((prevIndex) => Math.max(0, prevIndex - 1));
   };
@@ -125,6 +125,7 @@ export default function Screen() {
             <Text className="text-base">{sermon.application}</Text>
           </View>
         </View>
+        <View className="h-8"></View>
       </ScrollView>
     </SafeAreaView>
   );
