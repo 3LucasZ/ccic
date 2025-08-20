@@ -23,23 +23,16 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "~/components/ui/tooltip";
-import { Link } from "expo-router";
+import { Link, router } from "expo-router";
 import { Textarea } from "~/components/ui/textarea";
 
 export default function Screen() {
   const [value, setValue] = React.useState("");
   return (
     <View className="flex-col">
-      <Link href={"/sign-in"} asChild>
-        <Button>
-          <Text>Sign in</Text>
-        </Button>
-      </Link>
-      <Link href={"/experiment"} asChild>
-        <Button>
-          <Text>Experiment</Text>
-        </Button>
-      </Link>
+      {/* <Button onPress={() => router.push("/sign-in")}>
+        <Text>Experiment</Text>
+      </Button> */}
       {/* <ScrollView horizontal showsHorizontalScrollIndicator={false}>
         <View className="flex-row gap-4 p-2">
           {Array.from({ length: 10 }).map((_, index) => (
@@ -66,6 +59,7 @@ export default function Screen() {
           <Text>How is God calling you to love one another today?</Text>
         </CardContent>
       </Card>
+      <View className="h-4"></View>
       <Card className="w-full">
         <CardHeader>
           <CardTitle>Bulletin Board</CardTitle>
