@@ -55,6 +55,9 @@ export default function Screen() {
             <Text>Sign out</Text>
           </Button>
         )}
+        {/* <Button className="bg-teal-400" disabled>
+          <Text>Verified</Text>
+        </Button> */}
         <Tabs
           value={value}
           onValueChange={setValue}

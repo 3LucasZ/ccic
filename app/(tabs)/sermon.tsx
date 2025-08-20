@@ -66,32 +66,29 @@ export default function Screen() {
 
   return (
     <SafeAreaView className="flex-1">
-      <ScrollView contentContainerClassName="p-4 gap-y-6">
-        <View className="flex-row items-center justify-between">
-          <Button
-            onPress={handlePrev}
-            disabled={index === 0}
-            variant="ghost"
-            size="icon"
-          >
-            <ChevronLeft className="text-white" />
-          </Button>
-          <View className="flex-1 items-center">
-            <Text className="text-xl font-bold text-center">
-              {sermon.title}
-            </Text>
-            <Text className="text-muted-foreground">{sermon.date}</Text>
-          </View>
-          <Button
-            onPress={handleNext}
-            disabled={index === sermons.length - 1}
-            variant="ghost"
-            size="icon"
-          >
-            <ChevronRight className="text-white" />
-          </Button>
+      <View className="flex-row items-center justify-between pb-4">
+        <Button
+          onPress={handlePrev}
+          disabled={index === 0}
+          variant="ghost"
+          size="icon"
+        >
+          <ChevronLeft className="text-white" />
+        </Button>
+        <View className="flex-1 items-center">
+          <Text className="text-xl font-bold text-center">{sermon.title}</Text>
+          <Text className="text-muted-foreground">{sermon.date}</Text>
         </View>
-
+        <Button
+          onPress={handleNext}
+          disabled={index === sermons.length - 1}
+          variant="ghost"
+          size="icon"
+        >
+          <ChevronRight className="text-white" />
+        </Button>
+      </View>
+      <ScrollView contentContainerClassName="px-4 gap-y-6">
         <View className="flex-row gap-x-4">
           <Button className="flex-1">
             <Text>Watch on YouTube</Text>

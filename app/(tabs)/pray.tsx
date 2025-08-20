@@ -3,6 +3,7 @@ import React, { useEffect, useRef, useState } from "react";
 import {
   ActivityIndicator,
   Pressable,
+  RefreshControl,
   SafeAreaView,
   ScrollView,
   View,
@@ -59,6 +60,13 @@ export default function Screen() {
   const bottomSheetRef = useRef<BottomSheet>(null);
   const handleClosePress = () => bottomSheetRef.current?.close();
   const handleOpenPress = () => bottomSheetRef.current?.expand();
+  const [refreshing, setRefreshing] = React.useState(false);
+  const onRefresh = React.useCallback(async () => {
+    const { data, error } = await prayerReqsQuery;
+    if (data) {
+      setPrayers(data);
+    }
+  }, []);
   if (loading) {
     return (
       <SafeAreaView className="flex-1 justify-center items-center">
@@ -89,7 +97,12 @@ export default function Screen() {
             </TabsTrigger>
           </TabsList>
           <TabsContent value="all">
-            <ScrollView showsVerticalScrollIndicator={false}>
+            <ScrollView
+              showsVerticalScrollIndicator={false}
+              refreshControl={
+                <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+              }
+            >
               <View className="gap-2">
                 {prayers ? (
                   prayers.map((prayer, idx) => (
