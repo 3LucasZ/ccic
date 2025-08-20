@@ -25,21 +25,24 @@ import BottomSheetPray from "~/components/BottomSheetPray";
 import { Tables } from "~/lib/types";
 import { supabase } from "~/lib/supabase";
 import { useSession } from "~/lib/ctx";
+import { QueryData } from "@supabase/supabase-js";
 
 export default function Screen() {
   const { session } = useSession();
   const [value, setValue] = React.useState("all");
   const [loading, setLoading] = useState(true);
-  const [prayers, setPrayers] = useState<Tables<"prayer_reqs">[]>([]);
+  const prayerReqsQuery = supabase
+    .from("prayer_reqs")
+    .select("*, author:users(*)");
+  type PrayerReqs = QueryData<typeof prayerReqsQuery>;
+  const [prayers, setPrayers] = useState<PrayerReqs>([]);
 
   useEffect(() => {
     async function getData() {
       // Reset state and start loading
       setLoading(true);
       setPrayers([]);
-      const { data, error } = await supabase
-        .from("prayer_reqs")
-        .select("*, users(*)");
+      const { data, error } = await prayerReqsQuery;
       console.log(data);
       if (data) {
         setPrayers(data);
@@ -88,14 +91,19 @@ export default function Screen() {
           <TabsContent value="all">
             <ScrollView showsVerticalScrollIndicator={false}>
               <View className="gap-2">
-                {prayers.map((prayer) => (
-                  <Prayer
-                    name={"prayer.text"}
-                    avatar_uri="LZ"
-                    text={prayer.text}
-                    date={new Date()}
-                  />
-                ))}
+                {prayers ? (
+                  prayers.map((prayer, idx) => (
+                    <Prayer
+                      name={prayer.author.name}
+                      avatar_uri={prayer.author.uri}
+                      text={prayer.text}
+                      date={new Date(prayer.created_at)}
+                      key={idx}
+                    />
+                  ))
+                ) : (
+                  <Text>No prayers to display</Text>
+                )}
                 <View className="h-36"></View>
               </View>
             </ScrollView>

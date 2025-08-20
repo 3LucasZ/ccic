@@ -42,7 +42,11 @@ export function SessionProvider({ children }: PropsWithChildren) {
     useStorageState(sessionStorageKey);
   const session = sessionStr ? JSON.parse(sessionStr) : null;
   // (Later if necessary) The empty dependency array ensures this runs only once on mount.
-  useEffect(() => {}, []);
+  // useEffect(() => {
+  //   supabase.auth.getSession().then(({ data: { session } }) => {
+  //     console.log("supabase.auth.getSession()", session);
+  //   });
+  // }, []);
   // return
   return (
     <AuthContext
