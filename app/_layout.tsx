@@ -19,6 +19,8 @@ import { TvIcon } from "lucide-react-native";
 import { SessionProvider } from "~/lib/ctx";
 import { SplashScreenController } from "~/lib/splash";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
+import { SQLiteProvider, useSQLiteContext } from "expo-sqlite";
+
 const LIGHT_THEME: Theme = {
   ...DefaultTheme,
   colors: NAV_THEME.light,
@@ -46,12 +48,17 @@ export default function RootLayout() {
   return (
     <SessionProvider>
       <ThemeProvider value={isDarkColorScheme ? DARK_THEME : LIGHT_THEME}>
-        <GestureHandlerRootView>
-          <SplashScreenController />
-          <StatusBar style={isDarkColorScheme ? "light" : "dark"} />
-          <RootNavigator />
-          <PortalHost />
-        </GestureHandlerRootView>
+        <SQLiteProvider
+          databaseName="bible.db"
+          assetSource={{ assetId: require("../assets/bible.db") }}
+        >
+          <GestureHandlerRootView>
+            <SplashScreenController />
+            <StatusBar style={isDarkColorScheme ? "light" : "dark"} />
+            <RootNavigator />
+            <PortalHost />
+          </GestureHandlerRootView>
+        </SQLiteProvider>
       </ThemeProvider>
     </SessionProvider>
   );

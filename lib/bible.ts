@@ -1,3 +1,15 @@
+import { SQLiteDatabase } from "expo-sqlite";
+
+export async function getBibleText(references: string, db: SQLiteDatabase) {
+    const q = generateBibleQuery(references);
+    // console.log(q);
+    const passageTextQuery = await db.getAllAsync(q);
+    // console.log(passageTextQuery);
+    const stringArray: string[] = passageTextQuery.map(item => item.text);
+    const singleString: string = stringArray.join("");
+    return singleString
+}
+
 /**
  * Converts a string of Bible references into a SQL query for an SQLite database.
  * The function handles single verses, verse ranges, full chapters, and multi-chapter ranges.
