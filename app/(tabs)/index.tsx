@@ -72,9 +72,9 @@ export default function Screen() {
   return (
     <SafeAreaView>
       <ScrollView className="flex-col h-full">
-        {/* <Button onPress={() => router.push("/experiment")}>
-        <Text>Experiment</Text>
-      </Button> */}
+        <Button onPress={() => router.push("/experiment")}>
+          <Text>Experiment</Text>
+        </Button>
         <ScrollView horizontal showsHorizontalScrollIndicator={false}>
           <View className="flex-row gap-4 p-2">
             {fakeUsers.map((user) => (
@@ -118,7 +118,7 @@ export default function Screen() {
         <Text className="p-4 text-2xl font-bold">Posts</Text>
         <View className="flex-col gap-4">
           {posts.map((post) => (
-            <PostBlock title={post.title} text={post.text} />
+            <PostBlock title={post.title} text={post.text} key={post.id} />
           ))}
         </View>
       </ScrollView>
