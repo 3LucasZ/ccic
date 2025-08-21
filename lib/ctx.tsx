@@ -5,6 +5,7 @@ import {
   useState,
   useEffect,
 } from "react";
+import * as AppleAuthentication from "expo-apple-authentication";
 import { useStorageState } from "./useStorageState";
 import {
   GoogleSignin,
@@ -15,12 +16,14 @@ import { Session, User } from "@supabase/supabase-js";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const AuthContext = createContext<{
-  signIn: () => Promise<void>;
+  signInGoogle: () => Promise<void>;
+  signInApple: () => Promise<void>;
   signOut: () => Promise<void>;
   session?: Session | null;
   isLoading: boolean;
 }>({
-  signIn: async () => {},
+  signInGoogle: async () => {},
+  signInApple: async () => {},
   signOut: async () => {},
   session: null,
   isLoading: false,
@@ -51,7 +54,7 @@ export function SessionProvider({ children }: PropsWithChildren) {
   return (
     <AuthContext
       value={{
-        signIn: async () => {
+        signInGoogle: async () => {
           try {
             await GoogleSignin.hasPlayServices();
             const userInfo = await GoogleSignin.signIn();
@@ -84,6 +87,53 @@ export function SessionProvider({ children }: PropsWithChildren) {
               // play services not available or outdated
             } else {
               // some other error happened
+            }
+          }
+        },
+        signInApple: async () => {
+          console.log("signInApple");
+          try {
+            const credential = await AppleAuthentication.signInAsync({
+              requestedScopes: [
+                AppleAuthentication.AppleAuthenticationScope.FULL_NAME,
+                AppleAuthentication.AppleAuthenticationScope.EMAIL,
+              ],
+            });
+            // User is signed into Apple
+            if (credential.identityToken) {
+              const {
+                error,
+                data: { user },
+              } = await supabase.auth.signInWithIdToken({
+                provider: "apple",
+                token: credential.identityToken,
+              });
+              console.log(JSON.stringify({ error, user }, null, 2));
+              if (!error) {
+                // User is signed into supabase
+                // Insert new custom user into supabase
+                try {
+                  const name =
+                    (credential.fullName?.givenName || "") +
+                      (credential.fullName?.familyName || "") || "New User";
+                  const email = credential.email || "new.user@gmail.com";
+                  await supabase.from("users").insert({
+                    id: credential.user,
+                    name: name,
+                    email: email,
+                    uri: "",
+                  });
+                } catch {}
+              }
+            } else {
+              throw new Error("No identityToken.");
+            }
+          } catch (e) {
+            if (e.code === "ERR_REQUEST_CANCELED") {
+              // handle that the user canceled the sign-in flow
+            } else {
+              // handle other errors
+              console.error(e, e.code);
             }
           }
         },

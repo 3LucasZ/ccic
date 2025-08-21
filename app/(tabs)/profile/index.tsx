@@ -11,7 +11,7 @@ import { useSession } from "~/lib/ctx";
 import { fallbackFromName } from "~/lib/utils";
 
 export default function Screen() {
-  const { session, signIn, signOut } = useSession();
+  const { session, signInGoogle: signIn, signOut } = useSession();
   const user = session?.user;
   // console.log(user);
 
@@ -21,7 +21,13 @@ export default function Screen() {
       <View className="flex-1 gap-y-6">
         <View className="flex-row items-center">
           <Avatar alt="" className="w-24 h-24">
-            <AvatarImage source={{ uri: user?.user_metadata.picture }} />
+            <AvatarImage
+              source={{
+                uri: user
+                  ? user.user_metadata.picture
+                  : "https://github.com/shadcn.png",
+              }}
+            />
             <AvatarFallback>
               <Text>{fallbackFromName(user?.user_metadata.name)}</Text>
             </AvatarFallback>
@@ -39,7 +45,7 @@ export default function Screen() {
         {!user && (
           <Button
             onPress={async () => {
-              router.push("/sign-in");
+              router.replace("/sign-in");
             }}
           >
             <Text>Sign in</Text>
@@ -48,8 +54,8 @@ export default function Screen() {
         {user && (
           <Button
             onPress={async () => {
+              router.replace("/sign-in");
               await signOut();
-              router.push("/sign-in");
             }}
           >
             <Text>Sign out</Text>
