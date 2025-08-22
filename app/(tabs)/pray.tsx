@@ -175,7 +175,7 @@ function Prayer({
         <MyAvatar name={name} uri={avatar_uri} size={50} />
         {/* This View takes up the middle space, pushing the icon to the right */}
         <View className="flex-1 ml-4">
-          <Text>{name}</Text>
+          <Text className="font-semibold">{name}</Text>
           {/* Use CardDescription for secondary info. Format the date nicely. */}
           <CardDescription>
             {date.toLocaleDateString("en-US", {

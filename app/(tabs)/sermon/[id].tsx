@@ -37,7 +37,12 @@ export default function Screen() {
   const [loading, setLoading] = useState(true);
   const [sermons, setSermons] = useState<Tables<"sermons">[]>([]);
   const local = useLocalSearchParams();
-  const [index, setIndex] = useState(parseInt(local.id));
+  const initId = parseInt(local.id);
+  const initIndex = Math.max(
+    0,
+    sermons.findIndex((sermon) => sermon.id == initId)
+  );
+  const [index, setIndex] = useState(initIndex);
   const sermon = sermons?.[index];
   const [passageText, setPassageText] = useState("");
 
@@ -87,7 +92,10 @@ export default function Screen() {
   if (!sermon) {
     return (
       <SafeAreaView className="flex-1 justify-center items-center">
-        <Text>No sermons found.</Text>
+        <Text className="p-8 text-xl">Sermon selected does not exist.</Text>
+        <Button onPress={() => router.replace("/sermon/all")}>
+          <Text>Return to list</Text>
+        </Button>
       </SafeAreaView>
     );
   }
