@@ -17,7 +17,7 @@ export default function MyAvatar({
       {nameToInitials(name)}
     </Text>
   ) : (
-    <UserRound size={size} />
+    <UserRound size={(2 * size) / 3} />
   );
 
   return (
