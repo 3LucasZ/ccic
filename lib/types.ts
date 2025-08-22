@@ -14,6 +14,45 @@ export type Database = {
   }
   public: {
     Tables: {
+      friend_reqs: {
+        Row: {
+          created_at: string
+          from_id: string
+          id: number
+          status: string
+          to_id: string
+        }
+        Insert: {
+          created_at?: string
+          from_id?: string
+          id?: number
+          status?: string
+          to_id?: string
+        }
+        Update: {
+          created_at?: string
+          from_id?: string
+          id?: number
+          status?: string
+          to_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "friend_reqs_from_id_fkey"
+            columns: ["from_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "friend_reqs_to_id_fkey"
+            columns: ["to_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       posts: {
         Row: {
           created_at: string

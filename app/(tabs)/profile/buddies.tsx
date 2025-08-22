@@ -6,19 +6,17 @@ import { Button } from "~/components/ui/button";
 import { Check } from "~/lib/icons/Check";
 import { X } from "~/lib/icons/X";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "~/components/ui/tabs";
-import { Link, router } from "expo-router";
+import { Link, Redirect, router } from "expo-router";
 import { useSession } from "~/lib/ctx";
 import { nameToImg } from "~/lib/utils";
 import { ChevronLeft } from "~/lib/icons/ChevronLeft";
 import ChevronHeader from "~/components/ChevronHeader";
 import { Input } from "~/components/ui/input";
 import MyAvatar from "~/components/MyAvatar";
-
-type Buddy = {
-  id: number;
-  name: string;
-  avatar_uri: string;
-};
+import { useEffect, useState } from "react";
+import { Tables } from "~/lib/types";
+import { supabase } from "~/lib/supabase";
+import { QueryData } from "@supabase/supabase-js";
 
 export const fakeUsers = [
   {
@@ -43,17 +41,60 @@ export const fakeUsers = [
   },
 ];
 export default function Screen() {
-  const { session } = useSession();
-  const user = session?.user;
+  const { user } = useSession();
+  if (!user) return <Redirect href="/" />;
+
   // console.log(user);
   const [selectedTab, setSelectedTab] = React.useState("buddies");
-  const [value, setValue] = React.useState("");
+  const [value, setValue] = useState("");
   const onChangeText = (text: string) => {
     setValue(text);
   };
-  const buddies = fakeUsers.filter(
+
+  // load users, friend reqs
+  const [users, setUsers] = useState<Tables<"users">[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  const fetchSentReqs = supabase
+    .from("friend_reqs")
+    .select(
+      "*, from:users!friend_reqs_from_id_fkey(*), to:users!friend_reqs_to_id_fkey(*)"
+    )
+    .eq("from.id", user.id);
+  type SentReqs = QueryData<typeof fetchSentReqs>;
+  const [sentReqs, setSentReqs] = useState<SentReqs>([]);
+
+  const fetchReqs = supabase
+    .from("friend_reqs")
+    .select(
+      "*, from:users!friend_reqs_from_id_fkey(*), to:users!friend_reqs_to_id_fkey(*)"
+    )
+    .eq("to.id", user.id);
+  type Reqs = QueryData<typeof fetchReqs>;
+  const [reqs, setReqs] = useState<Reqs>([]);
+
+  useEffect(() => {
+    async function init() {
+      const { data: d1, error: e1 } = await fetchReqs;
+      if (d1) {
+        setReqs(d1);
+      }
+      const { data: d2, error: e2 } = await fetchSentReqs;
+      if (d2) {
+        setSentReqs(d2);
+      }
+    }
+    init();
+  }, []);
+  const usersFiltered = users.filter(
     (buddy) => buddy.name.toLowerCase().indexOf(value.toLowerCase()) == 0
   );
+  const reqsFiltered = reqs
+    .map((req) => req.from)
+    .filter((req) => req.name.toLowerCase().indexOf(value.toLowerCase()) == 0);
+  const sentReqsFiltered = sentReqs
+    .map((req) => req.to)
+    .filter((req) => req.name.toLowerCase().indexOf(value.toLowerCase()) == 0);
 
   return (
     <SafeAreaView className="flex-1 p-4">
@@ -82,10 +123,10 @@ export default function Screen() {
         </TabsList>
         <TabsContent value="buddies" className="flex-1 p-4">
           <UserList
-            users={buddies}
-            actions={(user: Buddy) => <BuddyActions user={user} />}
+            users={usersFiltered}
+            actions={(user: Tables<"users">) => <BuddyActions user={user} />}
             emptyStateMessage={
-              buddies
+              usersFiltered
                 ? "No users matched your search."
                 : "You haven't added any buddies yet."
             }
@@ -95,10 +136,10 @@ export default function Screen() {
         {/* Requests Tab */}
         <TabsContent value="requests" className="flex-1 p-4">
           <UserList
-            users={buddies}
+            users={reqsFiltered}
             actions={(user) => <RequestActions user={user} />}
             emptyStateMessage={
-              buddies
+              usersFiltered
                 ? "No users matched your search."
                 : "You have no new buddy requests."
             }
@@ -109,10 +150,10 @@ export default function Screen() {
         {/* TODO: you should be able to send requests in this tab too! */}
         <TabsContent value="pending" className="flex-1 p-4">
           <UserList
-            users={buddies}
+            users={sentReqsFiltered}
             actions={(user) => <PendingActions user={user} />}
             emptyStateMessage={
-              buddies
+              usersFiltered
                 ? "No users matched your search."
                 : "You have no pending requests."
             }
@@ -127,8 +168,8 @@ function UserList({
   actions,
   emptyStateMessage,
 }: {
-  users: Buddy[];
-  actions: (buddy: Buddy) => React.JSX.Element;
+  users: Tables<"users">[];
+  actions: (buddy: Tables<"users">) => React.JSX.Element;
   emptyStateMessage: string;
 }) {
   if (users.length === 0) {
@@ -142,7 +183,7 @@ function UserList({
           <UserListItem
             key={user.id}
             name={user.name}
-            avatar_uri={user.avatar_uri}
+            avatar_uri={user.uri}
             actions={actions(user)}
           />
         ))}
@@ -176,7 +217,7 @@ function EmptyState({ message }: { message: string }) {
   );
 }
 
-function RequestActions({ user }: { user: Buddy }) {
+function RequestActions({ user }: { user: Tables<"users"> }) {
   return (
     <>
       <Button
@@ -198,7 +239,7 @@ function RequestActions({ user }: { user: Buddy }) {
   );
 }
 
-function PendingActions({ user }: { user: Buddy }) {
+function PendingActions({ user }: { user: Tables<"users"> }) {
   return (
     <Button
       variant="outline"
@@ -209,7 +250,7 @@ function PendingActions({ user }: { user: Buddy }) {
     </Button>
   );
 }
-function BuddyActions({ user }: { user: Buddy }) {
+function BuddyActions({ user }: { user: Tables<"users"> }) {
   return <View></View>;
   return (
     <Button
