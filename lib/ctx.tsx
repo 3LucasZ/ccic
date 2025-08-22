@@ -22,8 +22,8 @@ const AuthContext = createContext<{
   signInGoogle: () => Promise<boolean>;
   signInApple: () => Promise<boolean>;
   signOut: () => Promise<void>;
-  session?: Session | null;
-  user?: Tables<"users"> | null;
+  session: Session | null;
+  user: Tables<"users"> | null;
   isLoading: boolean;
 }>({
   signInGoogle: async () => false,
@@ -164,6 +164,7 @@ export function SessionProvider({ children }: PropsWithChildren) {
         },
         signOut: async () => {
           setSessionStr("");
+          setUser(null);
           await supabase.auth.signOut();
           await GoogleSignin.hasPlayServices();
           await GoogleSignin.signOut();
