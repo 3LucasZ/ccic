@@ -49,9 +49,6 @@ export default function Screen() {
 
   useEffect(() => {
     async function getData() {
-      // Reset state and start loading
-      setLoading(true);
-      setPrayers([]);
       const { data, error } = await prayerReqsQuery;
       // console.log(data);
       if (data) {
