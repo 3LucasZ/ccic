@@ -30,6 +30,7 @@ import { useSession } from "~/lib/ctx";
 import { QueryData } from "@supabase/supabase-js";
 import { Input } from "~/components/ui/input";
 import FAB from "~/components/ui/FAB";
+import MyAvatar from "~/components/MyAvatar";
 
 export default function Screen() {
   const { session } = useSession();
@@ -171,13 +172,7 @@ function Prayer({
     <Card>
       {/* Use CardHeader for titles and avatars. Use flex-row for layout. */}
       <CardHeader className="flex-row items-center p-4">
-        <Avatar alt={`${name}'s avatar`} className="w-12 h-12">
-          <AvatarImage source={{ uri: avatar_uri }} />
-          <AvatarFallback>
-            <Text>{"LZ"}</Text>
-          </AvatarFallback>
-        </Avatar>
-
+        <MyAvatar name={name} uri={avatar_uri} size={50} />
         {/* This View takes up the middle space, pushing the icon to the right */}
         <View className="flex-1 ml-4">
           <CardTitle>{name}</CardTitle>

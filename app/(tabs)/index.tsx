@@ -1,5 +1,6 @@
 import * as React from "react";
 import { SafeAreaView, ScrollView, View } from "react-native";
+import { Image } from "expo-image";
 import Animated, {
   FadeInUp,
   FadeOutDown,
@@ -26,7 +27,7 @@ import {
 import { Link, router } from "expo-router";
 import { Textarea } from "~/components/ui/textarea";
 import { fakeUsers } from "./profile/buddies";
-import { fallbackFromName } from "~/lib/utils";
+import { nameToImg, nameToInitials } from "~/lib/utils";
 import FAB from "~/components/ui/FAB";
 import BottomSheetPost from "~/components/BottomSheetPost";
 import BottomSheet from "@gorhom/bottom-sheet";
@@ -35,6 +36,7 @@ import { useSession } from "~/lib/ctx";
 import { Separator } from "~/components/ui/separator";
 import { supabase } from "~/lib/supabase";
 import { QueryData } from "@supabase/supabase-js";
+import MyAvatar from "~/components/MyAvatar";
 
 export default function Screen() {
   const { session } = useSession();
@@ -72,9 +74,9 @@ export default function Screen() {
   return (
     <SafeAreaView>
       <ScrollView className="flex-col h-full">
-        <Button onPress={() => router.push("/experiment")}>
+        {/* <Button onPress={() => router.push("/experiment")}>
           <Text>Experiment</Text>
-        </Button>
+        </Button> */}
         <ScrollView horizontal showsHorizontalScrollIndicator={false}>
           <View className="flex-row gap-4 p-2">
             {fakeUsers.map((user) => (
@@ -131,12 +133,7 @@ export default function Screen() {
 function Buddy({ uri, name }: { uri: string; name: string }) {
   return (
     <View className="flex-col">
-      <Avatar alt={""} className="w-20 h-20">
-        <AvatarImage source={{ uri: uri }} />
-        <AvatarFallback>
-          <Text className="text-xl">{fallbackFromName(name)}</Text>
-        </AvatarFallback>
-      </Avatar>
+      <MyAvatar uri={uri} name={name} size={70} />
       <View className="h-2"></View>
       <Text className="text-xs w-20" numberOfLines={1}>
         {name}

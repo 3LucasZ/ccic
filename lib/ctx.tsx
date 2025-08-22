@@ -14,18 +14,23 @@ import {
 import { supabase } from "./supabase";
 import { Session, User } from "@supabase/supabase-js";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { emailToName } from "./utils";
+import { Tables } from "./types";
 
 const AuthContext = createContext<{
-  signInGoogle: () => Promise<void>;
-  signInApple: () => Promise<void>;
+  // boolean = sign in was successful
+  signInGoogle: () => Promise<boolean>;
+  signInApple: () => Promise<boolean>;
   signOut: () => Promise<void>;
   session?: Session | null;
+  user?: Tables<"users"> | null;
   isLoading: boolean;
 }>({
-  signInGoogle: async () => {},
-  signInApple: async () => {},
+  signInGoogle: async () => false,
+  signInApple: async () => false,
   signOut: async () => {},
   session: null,
+  user: null,
   isLoading: false,
 });
 
@@ -41,16 +46,40 @@ export function useSession() {
 export function SessionProvider({ children }: PropsWithChildren) {
   // session storage
   const sessionStorageKey = "session";
-  const [[isLoading, sessionStr], setSessionStr] =
+  const [[isLoadingSession, sessionStr], setSessionStr] =
     useStorageState(sessionStorageKey);
-  const session = sessionStr ? JSON.parse(sessionStr) : null;
-  // (Later if necessary) The empty dependency array ensures this runs only once on mount.
-  // useEffect(() => {
-  //   supabase.auth.getSession().then(({ data: { session } }) => {
-  //     console.log("supabase.auth.getSession()", session);
-  //   });
-  // }, []);
+  const session: Session = sessionStr ? JSON.parse(sessionStr) : null;
+  const [user, setUser] = useState<Tables<"users"> | null>(null);
+  // console.log(user);
+
+  useEffect(() => {
+    // supabase.auth.getSession().then(({ data: { session } }) => {
+    //   console.log("supabase.auth.getSession()", session);
+    // });
+    if (session) {
+      getUser(session.user.id);
+    }
+  }, [sessionStr]);
   // return
+  const getUser = async (userId: string) => {
+    try {
+      const { data, error, status } = await supabase
+        .from("users")
+        .select("*")
+        .eq("id", userId)
+        .single(); // Use .single() to get an object instead of an array
+      if (error) {
+        setUser(null);
+      }
+      if (data) {
+        setUser(data);
+      }
+    } catch (error) {
+      setUser(null);
+    } finally {
+      // setLoading(false)
+    }
+  };
   return (
     <AuthContext
       value={{
@@ -75,23 +104,17 @@ export function SessionProvider({ children }: PropsWithChildren) {
                   uri: data.user?.user_metadata.picture,
                 });
               } catch {}
+              return true;
             } else {
               throw new Error("no ID token present!");
             }
-          } catch (error: any) {
-            if (error.code === statusCodes.SIGN_IN_CANCELLED) {
-              // user cancelled the login flow
-            } else if (error.code === statusCodes.IN_PROGRESS) {
-              // operation (e.g. sign in) is in progress already
-            } else if (error.code === statusCodes.PLAY_SERVICES_NOT_AVAILABLE) {
-              // play services not available or outdated
-            } else {
-              // some other error happened
-            }
+          } catch (e) {
+            return false;
           }
         },
         signInApple: async () => {
-          console.log("signInApple");
+          // Sign into Apple
+          // console.log("signInApple");
           try {
             const credential = await AppleAuthentication.signInAsync({
               requestedScopes: [
@@ -99,42 +122,44 @@ export function SessionProvider({ children }: PropsWithChildren) {
                 AppleAuthentication.AppleAuthenticationScope.EMAIL,
               ],
             });
-            // User is signed into Apple
+            // console.log("credential", credential);
             if (credential.identityToken) {
-              const {
-                error,
-                data: { user },
-              } = await supabase.auth.signInWithIdToken({
+              // Sign into Supa
+              const { data, error } = await supabase.auth.signInWithIdToken({
                 provider: "apple",
                 token: credential.identityToken,
               });
-              console.log(JSON.stringify({ error, user }, null, 2));
+              // console.log("supa", JSON.stringify({ error, data }, null, 2));
               if (!error) {
-                // User is signed into supabase
+                setSessionStr(JSON.stringify(data.session));
                 // Insert new custom user into supabase
+                const email = data.user.email || "new.user@gmail.com";
+                const name =
+                  (credential.fullName?.givenName || "") +
+                    (credential.fullName?.familyName || "") ||
+                  emailToName(email);
                 try {
-                  const name =
-                    (credential.fullName?.givenName || "") +
-                      (credential.fullName?.familyName || "") || "New User";
-                  const email = credential.email || "new.user@gmail.com";
+                  // console.log("Creating new user");
                   await supabase.from("users").insert({
-                    id: credential.user,
+                    id: data.session.user.id,
                     name: name,
                     email: email,
                     uri: "",
                   });
-                } catch {}
+                } catch (e) {
+                  console.error(e);
+                }
+                return true;
+              } else {
+                console.error(error);
+                return false;
               }
             } else {
               throw new Error("No identityToken.");
             }
           } catch (e) {
-            if (e.code === "ERR_REQUEST_CANCELED") {
-              // handle that the user canceled the sign-in flow
-            } else {
-              // handle other errors
-              console.error(e, e.code);
-            }
+            console.error(e);
+            return false;
           }
         },
         signOut: async () => {
@@ -144,7 +169,8 @@ export function SessionProvider({ children }: PropsWithChildren) {
           await GoogleSignin.signOut();
         },
         session,
-        isLoading,
+        user,
+        isLoading: isLoadingSession,
       }}
     >
       {children}

@@ -8,10 +8,11 @@ import { X } from "~/lib/icons/X";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "~/components/ui/tabs";
 import { Link, router } from "expo-router";
 import { useSession } from "~/lib/ctx";
-import { fallbackFromName } from "~/lib/utils";
+import { nameToImg } from "~/lib/utils";
 import { ChevronLeft } from "~/lib/icons/ChevronLeft";
 import ChevronHeader from "~/components/ChevronHeader";
 import { Input } from "~/components/ui/input";
+import MyAvatar from "~/components/MyAvatar";
 
 type Buddy = {
   id: number;
@@ -160,12 +161,7 @@ function UserListItem({
 }) {
   return (
     <View className="flex-row items-center p-3">
-      <Avatar alt="" className="w-12 h-12">
-        <AvatarImage source={{ uri: avatar_uri }} />
-        <AvatarFallback>
-          <Text>{fallbackFromName(name)}</Text>
-        </AvatarFallback>
-      </Avatar>
+      <MyAvatar name={name} uri={avatar_uri} size={50} />
       <Text className="text-base font-semibold flex-1 ml-4">{name}</Text>
       <View className="flex-row gap-x-2">{actions}</View>
     </View>

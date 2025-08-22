@@ -1,5 +1,5 @@
 import * as React from "react";
-import { SafeAreaView, View } from "react-native";
+import { SafeAreaView, View, Image } from "react-native";
 import { Text } from "~/components/ui/text";
 import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar";
 import { Button } from "~/components/ui/button";
@@ -8,34 +8,23 @@ import { X } from "~/lib/icons/X";
 import { Tabs, TabsList, TabsTrigger } from "~/components/ui/tabs";
 import { Link, router } from "expo-router";
 import { useSession } from "~/lib/ctx";
-import { fallbackFromName } from "~/lib/utils";
+import { nameToImg, nameToInitials } from "~/lib/utils";
+import { UserRound } from "lucide-react-native";
+import MyAvatar from "~/components/MyAvatar";
 
 export default function Screen() {
-  const { session, signInGoogle: signIn, signOut } = useSession();
-  const user = session?.user;
-  // console.log(user);
+  const { user, signOut } = useSession();
 
   const [value, setValue] = React.useState("en");
   return (
     <SafeAreaView className="flex-1 p-4">
       <View className="flex-1 gap-y-6">
         <View className="flex-row items-center">
-          <Avatar alt="" className="w-24 h-24">
-            <AvatarImage
-              source={{
-                uri: user
-                  ? user.user_metadata.picture
-                  : "https://github.com/shadcn.png",
-              }}
-            />
-            <AvatarFallback>
-              <Text>{fallbackFromName(user?.user_metadata.name)}</Text>
-            </AvatarFallback>
-          </Avatar>
+          <MyAvatar uri={user?.uri} name={user?.name} size={80} />
           <View className="w-8"></View>
           <View>
             <Text className="text-2xl font-semibold">
-              {user?.user_metadata.name || "Guest"}
+              {user?.name || "Guest"}
             </Text>
             <Text className="text-gray-400">
               {user?.email || "guest@gmail.com"}
