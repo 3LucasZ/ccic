@@ -1,6 +1,7 @@
 import { Link, router, useLocalSearchParams } from "expo-router";
 import { useSQLiteContext } from "expo-sqlite";
 import { useEffect, useState } from "react";
+import * as Speech from "expo-speech";
 import {
   ActivityIndicator,
   Linking,
@@ -31,6 +32,8 @@ import { ChevronRight } from "~/lib/icons/ChevronRight";
 import { Download } from "~/lib/icons/Download";
 import { supabase } from "~/lib/supabase";
 import { Tables } from "~/lib/types";
+import { Volume2 } from "~/lib/icons/Volume2";
+import { Volume } from "~/lib/icons/Volume";
 
 export default function Screen() {
   const db = useSQLiteContext();
@@ -47,7 +50,7 @@ export default function Screen() {
   const [passageText, setPassageText] = useState("");
 
   useEffect(() => {
-    async function getData() {
+    async function fetchSermons() {
       setLoading(true);
       setSermons([]);
       const { data, error } = await supabase
@@ -62,15 +65,15 @@ export default function Screen() {
       }
       setLoading(false);
     }
-    getData();
+    fetchSermons();
   }, []);
   useEffect(() => {
-    async function getData() {
+    async function queryBible() {
       if (sermon?.passage) {
         setPassageText(await getBibleTextAsync(sermon.passage, db));
       }
     }
-    getData();
+    queryBible();
   }),
     [sermon];
 
@@ -177,19 +180,44 @@ function PassageText({ passage, text }: { passage: string; text: string }) {
   };
   const arrowRotation = isExpanded ? "rotate-180" : "rotate-0";
   const lineClamp = isExpanded ? "line-clamp-none" : "line-clamp-3";
+  const [isTalking, setIsTalking] = useState(false);
+  // useEffect(() => {
+  //   async function getVoices() {
+  //     const res = await Speech.getAvailableVoicesAsync();
+  //     console.log(res);
+  //   }
+  //   getVoices();
+  // }, []);
+  const toggleSpeech = () => {
+    if (isTalking) {
+      Speech.stop();
+      setIsTalking(false);
+    } else {
+      Speech.speak(text, { voice: "com.apple.eloquence.en-US.Reed" });
+      setIsTalking(true);
+    }
+  };
   return (
     <View>
-      <Pressable
-        onPress={toggleExpand}
-        className="flex-row justify-between items-center"
-      >
+      <View className="flex-row justify-between items-center">
         <Text className="text-muted-foreground font-semibold">{passage}</Text>
-        <ChevronDown
-          size={22}
-          color={"white"}
-          className={`transition-transform duration-300 ${arrowRotation}`}
-        />
-      </Pressable>
+        <View className="flex-row gap-6">
+          <Pressable onPress={toggleSpeech}>
+            {!isTalking ? (
+              <Volume2 size={22} color={"white"} />
+            ) : (
+              <Volume size={22} color={"white"} />
+            )}
+          </Pressable>
+          <Pressable onPress={toggleExpand}>
+            <ChevronDown
+              size={22}
+              color={"white"}
+              className={`transition-transform duration-300 ${arrowRotation}`}
+            />
+          </Pressable>
+        </View>
+      </View>
 
       <Text className={`text-muted-foreground ${lineClamp}`}>{text}</Text>
     </View>
