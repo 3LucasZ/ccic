@@ -68,10 +68,17 @@ export default function Screen() {
           </TabsList>
         </Tabs>
 
-        <Button onPress={() => router.push("/profile/buddies")}>
+        <Button
+          onPress={() => router.push("/profile/buddies")}
+          variant={"secondary"}
+          disabled={user == null}
+        >
           <Text>Buddies</Text>
         </Button>
-        <Button onPress={() => router.push("/profile/about")}>
+        <Button
+          onPress={() => router.push("/profile/about")}
+          variant={"secondary"}
+        >
           <Text>About Us</Text>
         </Button>
       </View>

@@ -111,14 +111,14 @@ export default function Screen() {
               <Text>Praying</Text>
             </TabsTrigger>
           </TabsList>
-          <TabsContent value="all">
+          <TabsContent value="all" className="pt-2 pb-20">
             <ScrollView
               showsVerticalScrollIndicator={false}
               refreshControl={
                 <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
               }
             >
-              <View className="gap-2">
+              <View className="gap-4">
                 {prayers ? (
                   prayers.map((prayer, idx) => (
                     <Prayer
@@ -167,7 +167,7 @@ function Prayer({
   const toggleStarred = () => {
     setStarred(!starred);
   };
-  const starStyle = starred ? "text-rose-400 fill-rose-400" : "text-white";
+  const starStyle = starred ? "text-rose-400 fill-rose-400" : "text-zinc-800";
   return (
     <Card>
       {/* Use CardHeader for titles and avatars. Use flex-row for layout. */}
@@ -175,7 +175,7 @@ function Prayer({
         <MyAvatar name={name} uri={avatar_uri} size={50} />
         {/* This View takes up the middle space, pushing the icon to the right */}
         <View className="flex-1 ml-4">
-          <CardTitle>{name}</CardTitle>
+          <Text>{name}</Text>
           {/* Use CardDescription for secondary info. Format the date nicely. */}
           <CardDescription>
             {date.toLocaleDateString("en-US", {
@@ -188,7 +188,7 @@ function Prayer({
 
         {/* Wrap interactive icons in a Button for better UX */}
         <Pressable className="w-12 h-12" onPress={toggleStarred}>
-          <Heart className={starStyle} size={32} />
+          <Heart className={starStyle} size={30} strokeWidth={1.2} />
         </Pressable>
       </CardHeader>
 
