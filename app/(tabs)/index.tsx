@@ -100,7 +100,9 @@ export default function Screen() {
             <CardTitle>Challenge</CardTitle>
           </CardHeader>
           <CardContent>
-            <Text>How is God calling you to love one another today?</Text>
+            <Text className="text-lg">
+              How is God calling you to love one another today?
+            </Text>
           </CardContent>
         </Card>
         <View className="h-4"></View>
@@ -109,15 +111,17 @@ export default function Screen() {
             <CardTitle>Bulletin Board</CardTitle>
           </CardHeader>
           <CardContent>
-            <Text>{"\u2022 7/16-20: Vacation Bible School (VBS)"}</Text>
-            <Text>{"\u2022 8/13: Hope Horizon Flooring Project"}</Text>
-            <Text>{"\u2022 8/2: Country Lane Beautification"}</Text>
-            <Text>{"\u2022 9/2: English congregation new time"}</Text>
+            <Text className="text-lg">
+              {`\u2022 7/16-20: Vacation Bible School (VBS)
+\u2022 8/13: Hope Horizon Flooring Project
+\u2022 8/2: Country Lane Beautification
+\u2022 9/2: English congregation new time`}
+            </Text>
           </CardContent>
         </Card>
 
         {/* <Separator className="my-4" /> */}
-        <Text className="p-4 text-2xl font-bold">Posts</Text>
+        <Text className="p-4 text-2xl font-bold text-center">Posts</Text>
         <View className="flex-col gap-4">
           {posts.map((post) => (
             <PostBlock title={post.title} text={post.text} key={post.id} />
@@ -135,7 +139,7 @@ function Buddy({ uri, name }: { uri: string; name: string }) {
     <View className="flex-col">
       <MyAvatar uri={uri} name={name} size={70} />
       <View className="h-2"></View>
-      <Text className="text-xs w-20" numberOfLines={1}>
+      <Text className="text-sm w-20 text-center" numberOfLines={1}>
         {name}
       </Text>
     </View>
@@ -143,13 +147,14 @@ function Buddy({ uri, name }: { uri: string; name: string }) {
 }
 function PostBlock({ title, text }: { title: string; text: string }) {
   return (
-    <Card className="w-full">
+    <View className="w-full">
+      <Separator></Separator>
       <CardHeader>
         <CardTitle className="text-xl">{title}</CardTitle>
       </CardHeader>
       <CardContent>
-        <Text>{text}</Text>
+        <Text className="text-lg">{text}</Text>
       </CardContent>
-    </Card>
+    </View>
   );
 }

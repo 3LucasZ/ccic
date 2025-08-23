@@ -9,7 +9,7 @@ export default function TabLayout() {
   return (
     <Tabs
       screenOptions={{
-        headerTitle: (props) => <Logo />,
+        headerTitle: (props) => <HeaderTitle />,
         headerStyle: {
           // remove ugly white outline
           shadowOpacity: 0,
@@ -54,9 +54,9 @@ export default function TabLayout() {
   );
 }
 
-function Logo() {
+function HeaderTitle() {
   return (
-    <View className="flex-row">
+    <View className="flex-row items-center">
       <Image
         className="w-8 h-8"
         source={require("../../assets/images/logo.png")}
@@ -64,7 +64,7 @@ function Logo() {
         contentFit="contain"
       />
       <View className="w-4"></View>
-      <Text>CCIC</Text>
+      <Text className="text-xl">CCIC</Text>
     </View>
   );
 }

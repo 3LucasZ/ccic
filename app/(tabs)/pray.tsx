@@ -87,7 +87,7 @@ export default function Screen() {
           placeholder="Search"
           value={value}
           onChangeText={onChangeText}
-          className=" mb-4"
+          className="mb-4"
         />
         <Tabs
           value={selectedTab}
@@ -172,7 +172,7 @@ function Prayer({
         <MyAvatar name={name} uri={avatar_uri} size={50} />
         {/* This View takes up the middle space, pushing the icon to the right */}
         <View className="flex-1 ml-4">
-          <Text className="font-semibold">{name}</Text>
+          <Text className="text-lg font-semibold">{name}</Text>
           {/* Use CardDescription for secondary info. Format the date nicely. */}
           <CardDescription>
             {date.toLocaleDateString("en-US", {
@@ -190,7 +190,7 @@ function Prayer({
       </CardHeader>
 
       <CardContent className="p-4 pt-0">
-        <Text className="text-base">{text}</Text>
+        <Text className="text-xl">{text}</Text>
       </CardContent>
       {/* CardFooter is often used for actions, moved the date to the header */}
     </Card>
