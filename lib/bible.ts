@@ -50,78 +50,55 @@ function generateBibleQuery(references: string): string {
     const lastSpaceIndex = ref.lastIndexOf(" ");
     if (lastSpaceIndex === -1) {
       throw `Invalid reference format: ${ref}`;
-      console.error(`Invalid reference format: ${ref}`);
-      continue;
     }
-
     let bookName = ref.substring(0, lastSpaceIndex).trim();
-    const chapterVersePart = ref.substring(lastSpaceIndex + 1).trim();
+    const chapterVerse = ref.substring(lastSpaceIndex + 1).trim();
 
-    // Check for a colon to see if it's a specific verse or verse range
-    if (chapterVersePart.includes(":")) {
-      // It's a chapter and verse reference
-      const [startChapter, versePart] = chapterVersePart.split(":");
-      let startVerse = parseInt(versePart);
-      let endVerse = startVerse;
-
-      // Check if it's a verse range (e.g., 17:1-13)
-      if (versePart.includes("-")) {
-        const [start, end] = versePart.split("-").map((v) => parseInt(v));
-        startVerse = start;
-        endVerse = end;
-        conditions.push(
-          `(b.name = '${bookName}' AND bv.chapter = ${startChapter} AND bv.verse BETWEEN ${startVerse} AND ${endVerse})`
-        );
-      } else {
-        // It's a single verse (e.g., 13:3)
-        conditions.push(
-          `(b.name = '${bookName}' AND bv.chapter = ${startChapter} AND bv.verse = ${startVerse})`
-        );
-      }
-    } else if (chapterVersePart.includes("-")) {
-      // It's a chapter-to-chapter range with verses (e.g., 18:1-19:1)
-      const [start, end] = chapterVersePart.split("-");
-      const [startChapter, startVerse] = start.split(":").map(Number);
-      const [endChapter, endVerse] = end.split(":").map(Number);
-
-      // Construct a precise WHERE clause for the chapter range
+    // Case: has "-" => range of verses
+    if (chapterVerse.includes("-")) {
+      var [chapterVerse1, chapterVerse2] = chapterVerse.split("-");
+      var [chapter1, verse1] = chapterVerse1.split(":");
+      // if chapter2 is not specified, assume its the same as chapter1
+      var [chapter2, verse2] = chapterVerse2.includes(":")
+        ? chapterVerse2.split(":")
+        : [chapter1, chapterVerse2];
       conditions.push(
         `(b.name = '${bookName}' AND (` +
-          `(bv.chapter = ${startChapter} AND bv.verse >= ${startVerse}) OR ` +
-          `(bv.chapter = ${endChapter} AND bv.verse <= ${endVerse}) OR ` +
-          `(bv.chapter > ${startChapter} AND bv.chapter < ${endChapter})` +
+          `(bv.chapter = ${chapter1} AND bv.verse >= ${verse1}) OR ` +
+          `(bv.chapter = ${chapter2} AND bv.verse <= ${verse2}) OR ` +
+          `(bv.chapter > ${chapter1} AND bv.chapter < ${chapter2})` +
           `))`
       );
     } else {
-      // It's a full chapter reference (e.g., 12)
-      const chapter = parseInt(chapterVersePart);
-      conditions.push(`(b.name = '${bookName}' AND bv.chapter = ${chapter})`);
+      // Case: single verse
+      if (chapterVerse.includes(":")) {
+        const [chapter, verse] = chapterVerse.split(":");
+        conditions.push(
+          `(b.name = '${bookName}' AND bv.chapter = ${chapter} AND bv.verse = ${verse})`
+        );
+      }
+      // Case: entire chapter
+      else {
+        conditions.push(
+          `(b.name = '${bookName}' AND bv.chapter = ${chapterVerse})`
+        );
+      }
     }
   }
 
   // Combine all conditions with 'OR'
   const whereClause = conditions.join(" OR ");
-
   // Construct the final query with a JOIN clause
-  return `SELECT bv.text FROM ASV_verses AS bv JOIN ASV_books AS b ON bv.book_id = b.id WHERE ${whereClause};`;
+  const query = `SELECT bv.text FROM ASV_verses AS bv JOIN ASV_books AS b ON bv.book_id = b.id WHERE ${whereClause};`;
+  console.log(query);
+  return query;
 }
 
-// TODO
 function isBibleReferenceFormat(text: string): boolean {
-  // Regex to validate a single Bible reference.
-  // It looks for:
-  // 1. One or more letters and spaces (for the book name).
-  // 2. A space.
-  // 3. One or more digits (for the chapter number).
-  // 4. Optionally, a colon followed by a verse or verse range.
-  //    - `:\d+`: A colon and one or more digits for a verse.
-  //    - `(?:-\d+)?`: An optional hyphen and digits for a verse range.
-  const regex = /^[A-Za-z\s]+\s\d+(?::\d+(?:-\d+)?)?$/;
-
-  // Split the input string by commas and trim whitespace from each part.
-  const references = text.split(",").map((ref) => ref.trim());
-
-  // Check if every part of the string matches the regex.
-  // The `every()` method returns `true` only if all elements pass the test.
-  return references.every((ref) => regex.test(ref));
+  try {
+    generateBibleQuery(text);
+    return true;
+  } catch (e) {
+    return false;
+  }
 }
