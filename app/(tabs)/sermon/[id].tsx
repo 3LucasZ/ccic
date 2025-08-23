@@ -70,12 +70,17 @@ export default function Screen() {
   useEffect(() => {
     async function queryBible() {
       if (sermon?.passage) {
-        setPassageText(await getBibleTextAsync(sermon.passage, db));
+        const newPassageText = await getBibleTextAsync(sermon.passage, db);
+        if (newPassageText) {
+          setPassageText(newPassageText);
+        } else {
+          setPassageText("");
+        }
       }
     }
     queryBible();
   }),
-    [sermon];
+    [index];
 
   const handlePrev = () => {
     setIndex((prevIndex) => Math.max(0, prevIndex - 1));
@@ -115,7 +120,8 @@ export default function Screen() {
   };
   return (
     <SafeAreaView className="flex-1">
-      <View className="flex-row items-center justify-between pb-4">
+      {/* Header */}
+      <View className="flex-row gap-3 items-center justify-between pb-4 ">
         <Button
           onPress={handlePrev}
           disabled={index === 0}
@@ -124,11 +130,10 @@ export default function Screen() {
         >
           <ChevronLeft className="text-white" />
         </Button>
-
         <View className="flex-1 items-center">
-          <Text className="text-xl font-bold text-center">{sermon.title}</Text>
+          <Text className="text-2xl font-bold text-center">{sermon.title}</Text>
           <Pressable onPress={() => router.push("/sermon/all")}>
-            <Text className="text-muted-foreground">
+            <Text className="text-muted-foreground text-lg">
               {dateToStr(new Date(sermon.date!))}
             </Text>
           </Pressable>
@@ -137,12 +142,13 @@ export default function Screen() {
           onPress={handleNext}
           disabled={index === sermons.length - 1}
           variant="ghost"
-          size="icon"
+          size={"icon"}
         >
           <ChevronRight className="text-white" />
         </Button>
       </View>
       <ScrollView contentContainerClassName="px-4 gap-y-6">
+        {/* Top buttons */}
         <View className="flex-row gap-x-4">
           <Button className="flex-1" onPress={watch} disabled={!sermon.yt_uri}>
             <Text>Watch on YouTube</Text>
@@ -154,17 +160,14 @@ export default function Screen() {
 
         {/* Sermon Details */}
         <View className="gap-y-4">
+          <PassageSection passage={sermon.passage} text={passageText} />
           <View>
-            <Text className="text-lg font-semibold mb-1">Passage</Text>
-            <PassageText passage={sermon.passage} text={passageText} />
+            <Text className="text-2xl font-semibold mb-1">Summary</Text>
+            <Text className="text-lg">{sermon.summary}</Text>
           </View>
           <View>
-            <Text className="text-lg font-semibold mb-1">Summary</Text>
-            <Text className="text-base">{sermon.summary}</Text>
-          </View>
-          <View>
-            <Text className="text-lg font-semibold mb-1">Application</Text>
-            <Text className="text-base">{sermon.application}</Text>
+            <Text className="text-2xl font-semibold mb-1">Application</Text>
+            <Text className="text-lg">{sermon.application}</Text>
           </View>
         </View>
         <View className="h-8"></View>
@@ -173,7 +176,7 @@ export default function Screen() {
   );
 }
 
-function PassageText({ passage, text }: { passage: string; text: string }) {
+function PassageSection({ passage, text }: { passage: string; text: string }) {
   const [isExpanded, setIsExpanded] = useState(false);
   const toggleExpand = () => {
     setIsExpanded(!isExpanded);
@@ -200,13 +203,13 @@ function PassageText({ passage, text }: { passage: string; text: string }) {
   return (
     <View>
       <View className="flex-row justify-between items-center">
-        <Text className="text-muted-foreground font-semibold">{passage}</Text>
+        <Text className="text-2xl font-semibold mb-1">Passage</Text>
         <View className="flex-row gap-6">
           <Pressable onPress={toggleSpeech}>
             {!isTalking ? (
-              <Volume2 size={22} color={"white"} />
+              <Volume2 color={"white"} />
             ) : (
-              <Volume size={22} color={"white"} />
+              <Volume color={"white"} />
             )}
           </Pressable>
           <Pressable onPress={toggleExpand}>
@@ -218,8 +221,14 @@ function PassageText({ passage, text }: { passage: string; text: string }) {
           </Pressable>
         </View>
       </View>
-
-      <Text className={`text-muted-foreground ${lineClamp}`}>{text}</Text>
+      <View className="flex-row justify-between items-center">
+        <Text className="text-lg text-muted-foreground font-semibold">
+          {passage}
+        </Text>
+      </View>
+      <Text className={`text-lg text-muted-foreground ${lineClamp}`}>
+        {text}
+      </Text>
     </View>
   );
 }

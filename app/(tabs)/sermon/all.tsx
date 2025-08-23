@@ -23,6 +23,7 @@ import {
   CollapsibleContent,
   CollapsibleTrigger,
 } from "~/components/ui/collapsible";
+import { Separator } from "~/components/ui/separator";
 import { Text } from "~/components/ui/text";
 import { getBibleTextAsync, getBibleTextSync } from "~/lib/bible";
 import { dateToStr } from "~/lib/datetime";
@@ -101,11 +102,12 @@ function Sermon({
   return (
     <Pressable onPress={() => router.replace(`/sermon/${id}`)}>
       <View className="flex-1 items-center">
-        <Text className="text-xl font-bold text-center">{title}</Text>
-        <Text className="text-muted-foreground">
+        <Text className="text-2xl font-bold text-center">{title}</Text>
+        <Text className="text-lg text-muted-foreground">
           {date ? dateToStr(new Date(date)) : "N/A"}
         </Text>
       </View>
+      <Separator className="mt-4" />
     </Pressable>
   );
 }
