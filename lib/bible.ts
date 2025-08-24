@@ -90,7 +90,7 @@ function generateBibleQuery(references: string): string {
   const whereClause = conditions.join(" OR ");
   // Construct the final query with a JOIN clause
   const query = `SELECT bv.text FROM ASV_verses AS bv JOIN ASV_books AS b ON bv.book_id = b.id WHERE ${whereClause};`;
-  console.log(query);
+  // console.log(query);
   return query;
 }
 

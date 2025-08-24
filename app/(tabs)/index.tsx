@@ -37,6 +37,7 @@ import { Separator } from "~/components/ui/separator";
 import { supabase } from "~/lib/supabase";
 import { QueryData } from "@supabase/supabase-js";
 import MyAvatar from "~/components/MyAvatar";
+import { Plus } from "~/lib/icons/Plus";
 
 export default function Screen() {
   const { session } = useSession();
@@ -128,7 +129,9 @@ export default function Screen() {
           ))}
         </View>
       </ScrollView>
-      <FAB disabled={session == null} onPress={openSheet} />
+      <FAB disabled={session == null} onPress={openSheet}>
+        <Plus />
+      </FAB>
       <BottomSheetPost ref={sheetRef} />
     </SafeAreaView>
   );

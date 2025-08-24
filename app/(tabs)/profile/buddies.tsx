@@ -17,6 +17,9 @@ import { useEffect, useState } from "react";
 import { Tables } from "~/lib/types";
 import { supabase } from "~/lib/supabase";
 import { QueryData } from "@supabase/supabase-js";
+import { Search } from "~/lib/icons/Search";
+import FAB from "~/components/ui/FAB";
+import { QrCode, Scan } from "lucide-react-native";
 
 export const fakeUsers = [
   {
@@ -46,33 +49,48 @@ export default function Screen() {
 
   // console.log(user);
   const [selectedTab, setSelectedTab] = React.useState("buddies");
-  const [value, setValue] = useState("");
-  const onChangeText = (text: string) => {
-    setValue(text);
-  };
 
-  // load users, friend reqs
-  const [users, setUsers] = useState<Tables<"users">[]>([]);
+  // ---load users, friend reqs---
+  const N = 25;
   const [loading, setLoading] = useState(true);
-
+  // searching
+  const [searchQueryTmp, setSearchQueryTmp] = useState("");
+  const [searchQuery, setSearchQuery] = useState("");
+  const onSearch = () => {
+    setSearchQuery(searchQueryTmp);
+  };
+  const onSearchInputChangeText = (text: string) => {
+    setSearchQueryTmp(text);
+  };
+  // sent requests
   const fetchSentReqs = supabase
     .from("friend_reqs")
-    .select(
-      "*, from:users!friend_reqs_from_id_fkey(*), to:users!friend_reqs_to_id_fkey(*)"
-    )
-    .eq("from.id", user.id);
+    .select("*, to:users!friend_reqs_to_id_fkey(*)")
+    .eq("from_id", user.id)
+    .eq("status", "pending")
+    .limit(N);
   type SentReqs = QueryData<typeof fetchSentReqs>;
   const [sentReqs, setSentReqs] = useState<SentReqs>([]);
-
+  // receiving requests
   const fetchReqs = supabase
+    .from("friend_reqs")
+    .select("*, from:users!friend_reqs_from_id_fkey(*)")
+    .eq("to_id", user.id)
+    .eq("status", "pending")
+    .limit(N);
+  type Reqs = QueryData<typeof fetchReqs>;
+  const [reqs, setReqs] = useState<Reqs>([]);
+  // buddies
+  const fetchBuddies = supabase
     .from("friend_reqs")
     .select(
       "*, from:users!friend_reqs_from_id_fkey(*), to:users!friend_reqs_to_id_fkey(*)"
     )
-    .eq("to.id", user.id);
-  type Reqs = QueryData<typeof fetchReqs>;
-  const [reqs, setReqs] = useState<Reqs>([]);
-
+    .eq("status", "accepted")
+    .or(`from_id.eq.${user.id}, to_id.eq${user.id}`)
+    .limit(N);
+  type Buddies = QueryData<typeof fetchBuddies>;
+  const [buddies, setBuddies] = useState<Buddies>([]);
   useEffect(() => {
     async function init() {
       const { data: d1, error: e1 } = await fetchReqs;
@@ -83,28 +101,28 @@ export default function Screen() {
       if (d2) {
         setSentReqs(d2);
       }
+      const { data: d3, error: e3 } = await fetchBuddies;
+      if (d3) {
+        setBuddies(d3);
+      }
     }
     init();
   }, []);
-  const usersFiltered = users.filter(
-    (buddy) => buddy.name.toLowerCase().indexOf(value.toLowerCase()) == 0
-  );
-  const reqsFiltered = reqs
-    .map((req) => req.from)
-    .filter((req) => req.name.toLowerCase().indexOf(value.toLowerCase()) == 0);
-  const sentReqsFiltered = sentReqs
-    .map((req) => req.to)
-    .filter((req) => req.name.toLowerCase().indexOf(value.toLowerCase()) == 0);
 
   return (
     <SafeAreaView className="flex-1 p-4">
       <ChevronHeader title="My Buddies" />
-      <Input
-        placeholder="Search"
-        value={value}
-        onChangeText={onChangeText}
-        className="mx-4 mb-4"
-      />
+      <View className="flex-row mx-4 mb-4 gap-4">
+        <Input
+          placeholder="Search"
+          value={searchQueryTmp}
+          onChangeText={onSearchInputChangeText}
+          className=" flex-1"
+        />
+        <Button size={"icon"} variant="secondary" className="w-12 h-12">
+          <Search />
+        </Button>
+      </View>
       <Tabs
         className="flex-1"
         value={selectedTab}
@@ -123,26 +141,20 @@ export default function Screen() {
         </TabsList>
         <TabsContent value="buddies" className="flex-1 p-4">
           <UserList
-            users={usersFiltered}
+            users={buddies.map((buddy) =>
+              buddy.from_id == user.id ? buddy.to : buddy.from
+            )}
             actions={(user: Tables<"users">) => <BuddyActions user={user} />}
-            emptyStateMessage={
-              usersFiltered
-                ? "No users matched your search."
-                : "You haven't added any buddies yet."
-            }
+            emptyStateMessage={"No users to display."}
           />
         </TabsContent>
 
         {/* Requests Tab */}
         <TabsContent value="requests" className="flex-1 p-4">
           <UserList
-            users={reqsFiltered}
+            users={reqs.map((req) => req.from)}
             actions={(user) => <RequestActions user={user} />}
-            emptyStateMessage={
-              usersFiltered
-                ? "No users matched your search."
-                : "You have no new buddy requests."
-            }
+            emptyStateMessage={"No users to display."}
           />
         </TabsContent>
 
@@ -150,16 +162,27 @@ export default function Screen() {
         {/* TODO: you should be able to send requests in this tab too! */}
         <TabsContent value="pending" className="flex-1 p-4">
           <UserList
-            users={sentReqsFiltered}
+            users={sentReqs.map((req) => req.to)}
             actions={(user) => <PendingActions user={user} />}
-            emptyStateMessage={
-              usersFiltered
-                ? "No users matched your search."
-                : "You have no pending requests."
-            }
+            emptyStateMessage={"No users to display."}
           />
         </TabsContent>
       </Tabs>
+      <FAB
+        onPress={() => {
+          router.push("/profile/qr");
+        }}
+        className="bottom-28"
+      >
+        <QrCode />
+      </FAB>
+      <FAB
+        onPress={() => {
+          router.push("/profile/scan");
+        }}
+      >
+        <Scan />
+      </FAB>
     </SafeAreaView>
   );
 }

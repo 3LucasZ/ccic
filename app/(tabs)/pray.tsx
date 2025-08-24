@@ -1,4 +1,3 @@
-import { HeartHandshake } from "~/lib/icons/Hands";
 import { Heart } from "~/lib/icons/Heart";
 import React, { useEffect, useRef, useState } from "react";
 import {
@@ -144,7 +143,9 @@ export default function Screen() {
           </TabsContent>
         </Tabs>
       </SafeAreaView>
-      <FAB disabled={session == null} onPress={handleOpenPress} />
+      <FAB disabled={session == null} onPress={handleOpenPress}>
+        <Plus />
+      </FAB>
       <BottomSheetPray ref={bottomSheetRef} />
     </GestureHandlerRootView>
   );
@@ -164,9 +165,10 @@ function Prayer({
   const toggleStarred = () => {
     setStarred(!starred);
   };
+  const cardStyle = starred ? "" : "";
   const starStyle = starred ? "text-rose-400 fill-rose-400" : "text-zinc-800";
   return (
-    <Card>
+    <Card className={`${cardStyle}`}>
       {/* Use CardHeader for titles and avatars. Use flex-row for layout. */}
       <CardHeader className="flex-row items-center p-4">
         <MyAvatar name={name} uri={avatar_uri} size={50} />
