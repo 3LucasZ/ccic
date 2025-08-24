@@ -1,6 +1,16 @@
 # Notes
 
+### Generate supabase types
+
 npx supabase gen types typescript --project-id "fspmohikcswypgukfean" --schema public > lib/types.ts
+
+### Disambiguate relations
+
+const fetchReqs = supabase
+.from("friend_reqs")
+.select(
+"_, from:users!friend_reqs_from_id_fkey(_), to:users!friend_reqs_to_id_fkey(\*)"
+)
 
 # Starter base
 
