@@ -47,7 +47,10 @@ export default function Screen() {
           if (uidVerify(data)) {
             // replace is very important
             // if we simply "push" the old page will be running and use cam resources
-            router.replace(`/profile/${data}`);
+            router.replace({
+              pathname: `/profile/[req_id]`,
+              params: { req_id: data, direction: "send" },
+            });
           } else {
             // console.log("INVALID");
           }

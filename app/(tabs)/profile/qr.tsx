@@ -1,4 +1,5 @@
 import { CameraView, CameraType, useCameraPermissions } from "expo-camera";
+import { router } from "expo-router";
 import { useState } from "react";
 import {
   Button,
@@ -11,6 +12,7 @@ import {
 import QRCode from "react-native-qrcode-svg";
 import ChevronHeader from "~/components/ChevronHeader";
 import { useSession } from "~/lib/ctx";
+import { supabase } from "~/lib/supabase";
 
 export default function Screen() {
   // qr code sizing
@@ -21,8 +23,29 @@ export default function Screen() {
     const smallerDimension = Math.min(width, height);
     setQrCodeSize(smallerDimension);
   };
-  // data
+  // user
   const { user } = useSession();
+  // realtime friend request
+  const channel = supabase
+    .channel("schema-db-changes")
+    .on(
+      "postgres_changes",
+      {
+        event: "INSERT",
+        schema: "public",
+        table: "friend_reqs",
+        // Filter so the user only gets notifications meant for them
+        filter: `to_id=eq.${user?.id}`,
+      },
+      (payload) => {
+        // console.log("New friend request!", payload.new);
+        router.replace({
+          pathname: `/profile/[req_id]`,
+          params: { req_id: payload.new.from_id, direction: "rcv" },
+        });
+      }
+    )
+    .subscribe();
   return (
     <SafeAreaView className="flex-1" onLayout={onLayout}>
       <ChevronHeader title="My Buddy Code" />

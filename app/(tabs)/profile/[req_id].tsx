@@ -11,9 +11,8 @@ import { useSession } from "~/lib/ctx";
 
 function Screen() {
   // data
-  const local = useLocalSearchParams();
-  const req_id = local.req_id;
-  if (typeof req_id !== "string") return;
+  const { req_id, direction } = useLocalSearchParams();
+  if (typeof req_id !== "string" || typeof direction !== "string") return;
   const { user: user1 } = useSession();
   const [user2, setUser2] = useState<Tables<"users">>();
   const [validId, setValidId] = useState(true);
@@ -46,6 +45,19 @@ function Screen() {
       </SafeAreaView>
     );
   }
+  const onPress = async () => {
+    if (direction === "send") {
+      await supabase
+        .from("friend_reqs")
+        .insert({ from_id: user1.id, to_id: user2.id });
+    } else {
+      await supabase
+        .from("friend_reqs")
+        .update({ status: "accepted" })
+        .eq("from_id", user2.id)
+        .eq("to_id", user1.id);
+    }
+  };
   return (
     <SafeAreaView className="flex-1">
       <ChevronHeader title="Buddy Request" />
@@ -54,15 +66,10 @@ function Screen() {
         <View className="h-20"></View>
         <Text className="text-4xl">{user2.name}</Text>
         <View className="h-10"></View>
-        <Button
-          size={"lg"}
-          onPress={async () => {
-            await supabase
-              .from("friend_reqs")
-              .insert({ from_id: user1.id, to_id: user2.id });
-          }}
-        >
-          <Text className="text-3xl">Send Request</Text>
+        <Button size={"lg"} onPress={onPress}>
+          <Text className="text-3xl">
+            {direction === "send" ? "Send Request" : "Accept Request"}
+          </Text>
         </Button>
       </View>
     </SafeAreaView>

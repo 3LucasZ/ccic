@@ -87,7 +87,7 @@ export default function Screen() {
       "*, from:users!friend_reqs_from_id_fkey(*), to:users!friend_reqs_to_id_fkey(*)"
     )
     .eq("status", "accepted")
-    .or(`from_id.eq.${user.id}, to_id.eq${user.id}`)
+    .or(`from_id.eq.${user.id}, to_id.eq.${user.id}`)
     .limit(N);
   type Buddies = QueryData<typeof fetchBuddies>;
   const [buddies, setBuddies] = useState<Buddies>([]);
@@ -102,6 +102,7 @@ export default function Screen() {
         setSentReqs(d2);
       }
       const { data: d3, error: e3 } = await fetchBuddies;
+      console.log(d3, e3);
       if (d3) {
         setBuddies(d3);
       }
